@@ -56,7 +56,7 @@ python3 tools/check_modkitignore.py --write
 # Build both release ZIPs: -hgss (HGSS / PokeMMO art only) and -hgss-pmd (+ PMDCollab).
 # Sprites are packed into atlas shards first (--no-atlas for per-file sheets;
 # --variant hgss|pmd for one build; --no-pmd / --rebake-pmd for the PMD bake).
-python3 scripts/build-mod.py --out-dir release
+python3 scripts/build-mod.py            # -> dist/ (every build goes there)
 python3 tools/validate_sprite_atlases.py
 ```
 

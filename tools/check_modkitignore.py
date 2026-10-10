@@ -40,7 +40,7 @@ EXCLUDED_DIRS = [
     ("# manual test checklist and other docs", "docs"),
 ]
 # local build output (names change with every build, so these go stale harmlessly)
-BUILD_DIRS = ["dist", "release"]
+BUILD_DIRS = ["dist"]  # every build goes to dist/ (scripts/build-mod.py default)
 # local notes, the developer guide and the README banner image
 EXCLUDED_FILES = ["CLAUDE.md", "DEVELOPMENT.md", "WoH.png"]
 

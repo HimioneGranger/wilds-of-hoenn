@@ -254,7 +254,8 @@ def main() -> int:
                     help="which release ZIP(s) to build (default: both)")
     ap.add_argument("--no-atlas", action="store_true", help="ship the raw per-file sheets instead of a baked atlas")
     ap.add_argument("--out-dir", default="dist",
-                    help="directory (relative to the repo root) to write the ZIP(s) into, e.g. release")
+                    help="directory (relative to the repo root) to write the ZIP(s) into; keep the default: "
+                         "every build of this mod goes to dist/")
     ap.add_argument("--no-pmd", action="store_true",
                     help="do not bake PMDCollab from SpriteCollab (an existing assets/pmd is still used by the pmd variant)")
     ap.add_argument("--rebake-pmd", action="store_true",
