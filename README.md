@@ -1,122 +1,130 @@
-<p align="center">
-  <img src="WoH.png" alt="Wilds of Hoenn" width="640">
-</p>
+<div align="center">
+
+<img src="WoH.png" alt="Wilds of Hoenn" width="640">
 
 # Wilds of Hoenn 🌿
 
-**The tall grass is alive. Walk into the wilds, and bring a partner.**
+*The tall grass is alive. Wild Pokémon roam the overworld of Ruby, Sapphire, Emerald, FireRed
+and LeafGreen. Walk up to one to battle it, and bring a partner along for the journey.*
 
-## Quick Summary
+</div>
 
-Bring Hoenn and Kanto to life in [Gen1Recomp](https://github.com/bryanthaboi/gen1recomp)'s Generation 3 games: **Ruby, Sapphire, Emerald, FireRed and LeafGreen**.
+A mod for [Gen1Recomp](https://github.com/bryanthaboi/gen1recomp)'s Generation 3 games.
 
-- 🦌 **Pokémon in the overworld.** Wild Pokémon wander in the grass, in the water and in caves. Walk into one and you start the battle.
-- 🤝 **Bring a partner.** Pick any Pokémon in your party menu and have it tag along for company, **forage** for items as you walk, or actively **battle** overworld Pokémon for you, like in Scarlet and Violet.
-- 🫂 **Build friendship.** Face your follower and press A to pet it, play with it, or talk to it. Its portrait shows how it really feels, based on its HP, status and friendship.
-- ✨ **Adjustable shiny rolls** for overworld encounters (gifts, eggs and starters are not affected).
-- 🔗 **Works with dex expansion mods** such as [National Dex Gen 3](https://github.com/poooooby/national_dex_gen3) and [G9 Battle Sprites (Gen 3)](https://github.com/poooooby/g9-battle-sprites-gen3), so overworld encounters can reach all the way through Generation 9. Art is included for the whole National Dex (1-1025). Optional [Modern Spawns](https://github.com/poooooby/g1r_modern_spawns) integration too.
-- 👾 Two sprite styles: **HGSS / PokeMMO** or fully animated **PMDCollab** sprites with walk, idle, attack and hurt animations (and swimming on water).
-- **+ much more on the way!**
+## ✨ Features
 
-### 💾 Installation
+### Core Mechanics
 
-1. Download a release ZIP from the [Releases](https://github.com/poooooby/wilds-of-hoenn/releases) page and pick **one**:
-   - **HGSS + PMDCollab** - the full experience (animated PMDCollab sprites, portraits, battle animations). About 58 MB. The PMDCollab art is licensed non-commercial (see [Third-party notices](#third-party-notices-and-credits)).
-   - **HGSS Only** - a much smaller download, made for lower-power devices (Anbernic, older Android, etc.).
-2. Import it with the Gen1Recomp Mod Manager (or drop it in your mods folder).
-3. Enable **Wilds of Hoenn**. FireRed and LeafGreen support is newer and less play-tested than Ruby, Sapphire and Emerald, so please report anything odd.
+- 🦌 **Wild Pokémon in the overworld:** Every area with wild encounters fills with visible
+  Pokémon wandering the grass, swimming the water and roaming caves. Walk onto one to start the
+  battle. They come straight from the game's own encounter tables, abilities, outbreaks and
+  roamers included, and only appear where you can actually reach them.
+- 🤝 **A partner with a job:** Choose any Pokémon in your party menu and give it a role. It can
+  **follow** you, **forage** for items as you walk, or **battle** the wild Pokémon around you,
+  Scarlet and Violet style.
+- 🎲 **Classic encounters, your call:** Keep the original step-based grass and Surf encounters
+  alongside the visible ones, or turn them off and only meet what you can see.
+- ✨ **Shiny chains** (with [Modern Spawns](https://github.com/poooooby/g1r_modern_spawns)): win
+  or catch the same species again and again and it turns up more, is likelier to be shiny and
+  has better stats. Shinies always show their colours on the overworld.
 
-## 📋 Options Summary
+### Your Companion
 
-### Start Menu (the mod's options in the Mod Manager)
+- 🫂 **Friendship you can see:** Face your partner and press A to **Pet**, **Play** fetch or
+  **Talk**. Each one raises its friendship, and its portrait shows how it really feels from
+  its HP, status and bond with you. Petting can even cure a status.
+- ⚔️ **Battler:** Stand still near a wild Pokémon and your partner charges in. It fights with
+  its real moves, stats and PP, on land or swimming out over water, and earns EXP. Health bars
+  and hit effects show on both sides. When it levels up, it tells you a new move or evolution
+  is ready, and you can open the game's own screens from its menu. It never faints: worn out,
+  it returns to you to rest.
+- 🍂 **Forager:** On routes and in caves, every 1-3 minutes of walking it catches a scent,
+  dashes to a glint on the ground and always digs something up. The fonder it is, the sooner it
+  finds things, and the rarer they get: evolution stones from friendship 130, the rarest finds
+  from 200.
+
+### A Living World
+
+- 🎨 **Two sprite styles:** **HGSS / PokeMMO** art for the whole National Dex, or fully
+  animated **PMDCollab** sprites with walk, idle, attack and hurt animations.
+- 🌊 **Water that feels like water:** Pokémon swim with a foam line on the water, leave ripples
+  on ponds and puddles, and cast reflections like the player and NPCs do.
+- 🌾 **Small touches:** Pokémon sink into tall grass, your partner fades in as you step out of a
+  door, and alternate forms (Rotom, Shellos, Basculin and many more) have their own art.
+- 📏 **True-to-life sizes** (with [Gen 3 HD Sprites](https://github.com/poooooby/gen3-hd-sprites)):
+  every species is drawn at its own relative size, smoothly, at your screen's resolution.
+
+## ⚙️ Options
+
+### Mod options (Mod Manager)
 
 | Option | Choices | Default | What it does |
 |---|---|---|---|
-| **Show Wild Mons** | On / Off | On | Spawns visible wild Pokémon in areas with wild encounters. |
-| **Sprite Style** | HGSS / PokeMMO, PMDCollab | PMDCollab | The look of wild Pokémon and your companion. PMDCollab has animated walk and idle loops; species without PMD art fall back to HGSS / PokeMMO. (PMDCollab is only in the HGSS + PMDCollab build.) |
-| **Classic Enc** | On / Off | On | Keeps the original step-based random encounters in grass and water. Visible wild Pokémon stay active either way. Fishing and Rock Smash are unaffected. |
-| **Silhouette** | Off / Undiscovered / All | Off | Draws visible wild Pokémon as black silhouettes: only species you haven't caught, or all of them. |
-| **Species Sizes** | On / Off | On | With the [Gen 3 HD Sprites](https://github.com/poooooby/gen3-hd-sprites) mod, draws each HGSS / PokeMMO species at its own relative size (a Charizard bigger than a Charmander), the same table as Wilds of Kanto Revival. Without that mod, or with its Field HD off, every species is drawn at its sheet's size. PMDCollab sprites are drawn at their own size unless tuned in `lib/PMD_scale.lua`. The two tables (`lib/HGSS_scale.lua`, `lib/PMD_scale.lua`) can be edited by hand. |
-| **Overworld Size** | 100%, 90%, 80%, 75%, 67%, 50% | 100% | Scales wild Pokémon and your follower, on top of Species Sizes (needs Gen 3 HD Sprites too). |
-| **Shiny Rate** | Native, 1/4096, 1/2048, 1/1024, 1/500, 1/100, 1/10, All | Native | *Native* uses the game's real shiny chance. The other rates give visible wild Pokémon an extra roll at that chance, keeping their nature and gender. *All* makes every one shiny. Does not affect gifts, eggs or starters. |
+| **Show Wild Mons** | On / Off | On | Visible wild Pokémon in areas with wild encounters. |
+| **Sprite Style** | HGSS / PokeMMO, PMDCollab | PMDCollab | The look of wild Pokémon and your partner. Species without PMDCollab art use HGSS / PokeMMO. (PMDCollab is in the HGSS + PMDCollab build only.) |
+| **Classic Enc** | On / Off | On | The original step-based grass and Surf encounters. Visible Pokémon stay either way; fishing and Rock Smash are unaffected. |
+| **Silhouette** | Off / Undiscovered / All | Off | Draws wild Pokémon as silhouettes: species you haven't caught, or all of them. |
+| **Species Sizes** | On / Off | On | Draws each species at its own relative size. Needs Gen 3 HD Sprites. |
+| **Overworld Size** | 100% to 50% | 100% | Scales wild Pokémon and your partner, on top of Species Sizes. Needs Gen 3 HD Sprites. |
 
-### Pokémon Menu (party menu: select a Pokémon, then choose a job)
+Shiny chains are switched on and off with Modern Spawns' **SHINY CHAINS** option.
 
-There is no Follower on/off option. The party leader follows until you choose someone else, and only one companion is out at a time.
+### Your partner (party menu)
 
-| Menu row | What your Pokémon does |
+Select a Pokémon in the party menu and choose its job. The party leader follows until you pick
+someone else, and one partner is out at a time.
+
+| Row | What it does |
 |---|---|
-| **FOLLOW** | Follows you. Face it and press A for **Pet** (a quick idle and its cry), **Play** (you throw a ball, it fetches it and spins) or **Talk** (it cries twice). Each one raises its friendship (Play +3, Pet +2, Talk +1), with limits so it can't be spammed. A hurt or sick Pokémon won't play and tells you why; petting a sick Pokémon has a 25% chance to cure it; talking shows how much it likes you. |
-| **BATTLE** | When you stand still and a wild overworld Pokémon is within **3 tiles of you**, it charges in for a short fight with its **real moves, stats, damage and PP**. Health bars and hit effects appear on both, and it earns a little EXP for a win. When it levels up, "New move ready!" or "Ready to evolve!" floats over its head: face it, press A and pick **Learn Move** or **Evolve** to open the game's own screens. It earns no more EXP until you have, and a Pokémon holding an Everstone never asks to evolve. The defeated Pokémon cries and sinks into the ground. A Battler is never knocked out: at 1 HP (or with no attack PP left) it runs back, cries and shrinks into you, and rests until it's healed. |
-| **FORAGE** | While you **walk on routes and in caves** (not in towns, buildings, the Safari Zone or on water), every **1-3 minutes** it catches a scent: it stops and perks up, a glint appears on the ground **3-5 tiles away**, it dashes over, digs, and **always** comes back with something for your bag (it cries to tell you). It never leaves your side for nothing. **Friendship matters**: the fonder it is, the sooner it finds things and the more eager it is, and rarer finds unlock as you bond (**friendship 130+**: rare items such as evolution stones and National Dex Gen 3's evolution items; **200+**: the rarest), with a bigger reaction for a rare find. Finds include healing and status items, Poké Balls, berries, evolution items and cheap TMs. Never HMs, key items, Master Balls, Rare Candy or high-level TMs, and a full bag means it waits. |
+| **FOLLOW** | Walks with you. Press A facing it for Pet, Play or Talk. |
+| **BATTLE** | Fights wild Pokémon within 3 tiles of you while you stand still. |
+| **FORAGE** | Digs up items while you walk on routes and in caves. |
 
-## 🤓 Dev Information
+## 💾 Installation
 
-```sh
-# Copy Wilds of Kanto Revival's overworld art (run once, or after that repo
-# updates its art); expects a sibling ../overworld-spawn-mod checkout. Not
-# committed to this repo (see .gitignore) -- a fresh clone needs this before
-# anything will actually draw a sprite.
-python3 tools/copy_wilds_assets.py
+1. Download a release from the [Releases](https://github.com/poooooby/wilds-of-hoenn/releases)
+   page. Pick **one**:
+   - **HGSS + PMDCollab**: the full experience, with animated PMDCollab sprites and portraits
+     (about 60 MB).
+   - **HGSS Only**: a much smaller download for lower-power devices (Anbernic, older Android).
+2. Import it with the Gen1Recomp Mod Manager, or drop it in your mods folder.
+3. Enable **Wilds of Hoenn**.
 
-# Optional: bake the PMDCollab sheets (needs a sibling ../SpriteCollab checkout)
-python3 tools/generate_pmd_sprites.py
+## 🔗 Works With
 
-# Standalone unit tests (plain Lua, no engine needed)
-for f in tests/*_unit_test.lua; do lua "$f" || echo "FAIL: $f"; done
+- [National Dex Gen 3](https://github.com/poooooby/national_dex_gen3): wild Pokémon all the way
+  to #1025, with overworld art for every one.
+- [G9 Battle Sprites (Gen 3)](https://github.com/poooooby/g9-battle-sprites-gen3): battle sprites
+  for the new species.
+- [Modern Spawns](https://github.com/poooooby/g1r_modern_spawns): modern encounter tables and
+  shiny chains.
+- [Gen 3 HD Sprites](https://github.com/poooooby/gen3-hd-sprites): smooth, true-to-size sprites.
 
-# Link this repo into a sibling ../gen1recomp checkout's mods/
-./scripts/bootstrap.sh
+## 🪪 Credits
 
-# Engine probe test + a ROM-free real-Loader boot test (luajit, run from
-# inside the gen1recomp checkout)
-cd ../gen1recomp
-luajit mods/wilds_of_hoenn/tests/engine_patch_probe_test.lua
-luajit mods/wilds_of_hoenn/tests/modkit_boot_test.lua
-luajit mods/wilds_of_hoenn/tests/forage_ndex_catalog_test.lua  # with national_dex_gen3 linked too
-cd -
+- **HGSS / PokeMMO overworld sprites:** many artists, collected by
+  [Wilds of Kanto Revival](https://github.com/poooooby/wilds-of-kanto-gen-3)
+  ([full credits](THIRD_PARTY_NOTICES.md)).
+- **PMDCollab sprites and portraits:** [PMDCollab/SpriteCollab](https://github.com/PMDCollab/SpriteCollab),
+  licensed **CC BY-NC 4.0** (non-commercial). Per-species artists ship in the HGSS + PMDCollab
+  build as `assets/pmd/CREDITS.txt`.
+- **Zygarde 100% overworld sprite:** [pokeemerald-expansion](https://github.com/rh-hideout/pokeemerald-expansion)
+  (Liamjd14, kittenchilly).
 
-# Pre-release validation
-python3 tools/validate_option_labels.py
-python3 tools/validate_release_version.py
+## 💡 Inspirations
 
-# .modkitignore lists every test / tool / script / doc by exact path (modkit has no
-# wildcards) so none of them ships. After adding a file under tests/, tools/,
-# scripts/ or docs/, regenerate it; the release build refuses to run while it's stale.
-python3 tools/check_modkitignore.py --write
-
-# Build the release ZIPs into release/: -hgss (HGSS / PokeMMO art only) and
-# -hgss-pmd (+ PMDCollab). Sprites are baked into atlas shards first;
-# --no-atlas for per-file sheets, --variant hgss|pmd for just one.
-python3 scripts/build-mod.py --out-dir release
-```
-
-- **Manual test checklist:** [`docs/MANUAL_TEST.md`](docs/MANUAL_TEST.md). **Changelog:** [`CHANGELOG.md`](CHANGELOG.md).
-- **Architecture:** start with the header comment of `lib/engine_patch.lua` (the only file that touches engine internals), then each module's own header in `lib/`. Tests mirror `lib/` one to one in `tests/`.
-
-### How it works
-
-Gen1Recomp's Gen 3 engine (`src/core/game3/`) has no mod seam yet for a visible overworld actor: `mod.world:spawnNpc` returns "not supported", `ow.entities` is a read-only snapshot, the field renderer has no draw hook, and collision has no mod hook ([RFC 0014](https://github.com/bryanthaboi/gen1recomp/blob/main/docs/rfcs/0014-mod-driven-actors-and-adopted-link-sessions.md) proposes one but it isn't implemented). This mod ships ahead of that, using the `engine_internals` permission to patch a handful of engine functions directly. `lib/engine_patch.lua` is the *only* file that does this and documents why each one is needed. The three that make the wild Pokémon work:
-
-- `FieldEffects.collectActors` - draws our wild Pokémon alongside the player, NPCs and the follower.
-- `Objects.blocks` - makes a wild Pokémon solid to NPCs, trainer sight and other wild Pokémon, while letting the player step onto one (a battle starts only once the player is standing on its tile).
-- `Follower.update` - piggybacks our per-tick update onto the engine's existing follower tick.
-
-The party menu's ROLE row (and its Follow / Forage / Fight submenu) adds three more: `PartyMenu.update`, `PartyMenu.handleInput` and `FieldMoves.fromMenu`, because the party menu has no mod hook for its action list. Every touch point is probed (`EnginePatch.probe()`) before it's patched, and `tests/engine_patch_probe_test.lua` runs the same probe against a real engine checkout. If a future Gen1Recomp update moves one, this mod disables itself and logs exactly what changed instead of crashing. Wild encounters themselves come from the engine's own rules (`Encounters.rules().rollSweetScent`); nothing about wild generation is reimplemented.
-
-This mod is a sister project to [Wilds of Kanto Revival](https://github.com/poooooby/wilds-of-kanto-gen-3), built from scratch for Gen 3's different engine. It shares no runtime code or save data with it, only a read-only copy of its overworld art.
+- **TTiN** and **Untamed Tohjo**: friendship-weighted foraging and shiny chains (used with
+  permission).
+- **Wilds of Kanto Revival**: this mod's sister project, for Generation 1 and 2.
 
 ## 🤖 AI Disclosure
 
-This mod was developed with help from [Claude Code](https://claude.com/claude-code) (Anthropic), working from direction, design decisions, in-game testing and bug reports from the maintainer, who also approves every release. AI-written code can contain mistakes, which is why the project ships a large unit-test suite, a real-engine probe test and a manual in-game checklist. If you find a bug, please open an issue here or on Discord.
+This mod was developed with help from [Claude Code](https://claude.com/claude-code) (Anthropic),
+working from the maintainer's direction, design decisions, in-game testing and bug reports. The
+maintainer approves every release. If you find a bug, please open an issue here or on Discord.
 
-## 🪪 Third-Party Notices and Credits
+---
 
-The mod's own code and tools are released under the [MIT License](LICENSE). The art it uses is **not** covered by that license:
-
-- **HGSS / PokeMMO overworld sprites** - a read-only copy of [Wilds of Kanto Revival](https://github.com/poooooby/wilds-of-kanto-gen-3)'s sprite sources, made by many individual artists (full credits in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and that project's notices).
-- **PMDCollab sprites and portraits** - from [PMDCollab/SpriteCollab](https://github.com/PMDCollab/SpriteCollab), licensed **CC BY-NC 4.0** (non-commercial); official-game graphics remain © Spike Chunsoft / Nintendo / The Pokémon Company. Per-species artist credits ship with the HGSS + PMDCollab release as `assets/pmd/CREDITS.txt`.
-- **Code** adapted from Wilds of Kanto Revival (MIT) is listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-- **Inspiration:** TTiN and Untamed Tohjo inspired the friendship-weighted foraging (a fonder Pokémon finds rarer items, and finds them sooner).
-
-See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for every asset's credit and terms. Pokémon and its characters are trademarks of Nintendo, Game Freak and The Pokémon Company; this is an unofficial fan project and is not affiliated with them.
+The mod's code is [MIT](LICENSE); the art is not (see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
+for every credit and licence). Pokémon is © Nintendo, Game Freak and The Pokémon Company; this is
+an unofficial fan project. Working on the mod? See [DEVELOPMENT.md](DEVELOPMENT.md).

@@ -146,7 +146,8 @@ end
 do
   reset()
   local wild = wildEntity(1, 13, 10) -- 2 cells from the player
-  local b = newBattler()
+  local chained = {}
+  local b = newBattler({ chainRecord = function(species, result) chained[#chained + 1] = { species, result } end })
   local mon = newMon()
   local sawChase, sawFight, sawAttack, sawBusy = false, false, false, false
   local maxOffset, hitSeen, barsSeen = 0, false, false
@@ -175,6 +176,8 @@ do
   check(hitSeen, "hit effects were shown")
   eq(#defeated, 1, "the defeated wild Pokemon was removed")
   eq(defeated[1], 1, "...the right one")
+  check(#chained == 1 and chained[1][1] == wild.species and chained[1][2] == "win",
+    "the win counts toward a shiny chain (Modern Spawns)")
   eq(cries[1], wild.species, "...after it cried")
   check(wild.renderer.act ~= nil or wild.engaged == false, "its skirmish state is cleaned up")
   check(mon.pp[1] < 10, "the Battler's PP was spent")

@@ -464,6 +464,29 @@ do
   check(en.cellX == x and en.cellY == y and not en.moving, "...and then stands its ground")
 end
 
+-- ------- a shiny chain's bonus reaches the visible spawns (Modern Spawns)
+do
+  local MS = V.require("modern_spawns_bridge")
+  local realBonus = MS.chainBonus
+  local asked = {}
+  MS.chainBonus = function(species) asked[#asked + 1] = species return { shiny = 0, perfectIvs = 6 } end
+  local smC = SpawnManager.new(mod)
+  smC:onMapEntered("ROUTE_1", { world = { player = { cellX = -1, cellY = -1 } } })
+  local ce
+  for _, e in pairs(smC.entities) do ce = e break end
+  check(ce ~= nil and #asked > 0 and asked[1] == ce.species, "each spawn asks for its species' chain bonus")
+  local perfect = 0
+  for _, v in pairs(ce and ce.ivs or {}) do if v == 31 then perfect = perfect + 1 end end
+  eq(perfect, 6, "...and carries the perfect stats into its battle")
+  MS.chainBonus = function() return nil end
+  local smN = SpawnManager.new(mod)
+  smN:onMapEntered("ROUTE_1", { world = { player = { cellX = -1, cellY = -1 } } })
+  local ne
+  for _, e in pairs(smN.entities) do ne = e break end
+  eq(ne and ne.ivs, nil, "no chain: IVs are left to the engine")
+  MS.chainBonus = realBonus
+end
+
 if failures > 0 then
   io.stderr:write(failures .. " failure(s)\n")
   os.exit(1)

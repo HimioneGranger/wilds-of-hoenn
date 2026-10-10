@@ -29,6 +29,10 @@ released under the MIT License:
 - **TTiN** and **Untamed Tohjo**: the idea of weighting a Forager's finds by its friendship (a fonder
   Pokemon finds better and rarer items) comes from their foraging. No code or assets were copied; the
   Forager here (`lib/forager.lua`, `lib/forage_items.lua`) is this mod's own implementation.
+- **TTiN** and **Untamed Tohjo**: the shiny chain -- beat or catch one species in a row and it turns up
+  more, is more likely to be shiny and has better stats -- comes from their work, used with permission.
+  No code or assets were copied; the chain here is our own implementation (Modern Spawns'
+  `src/chain.lua`, and `lib/shiny.lua` here).
 
 ## Overworld sprites
 
@@ -50,6 +54,17 @@ Wilds of Kanto Revival -- the two repos may diverge over time.
 
 See Wilds of Kanto Revival's `THIRD_PARTY_NOTICES.md` and `README.md` for
 the complete, authoritative credit list for this art.
+
+- **Zygarde 100% (Complete Forme)** -- its HGSS / PokeMMO land and swimming sheets
+  (`718-complete-*`) are baked from the overworld follower sprite and its normal / shiny
+  palettes in [pokeemerald-expansion](https://github.com/rh-hideout/pokeemerald-expansion)
+  (`graphics/pokemon/zygarde/complete/`): the follower sprites added by **Liamjd14**
+  ([#5336](https://github.com/rh-hideout/pokeemerald-expansion/pull/5336)) and redrawn
+  asymmetrical by **kittenchilly**
+  ([#9792](https://github.com/rh-hideout/pokeemerald-expansion/pull/9792)), with thanks to the
+  rh-hideout contributors. `tools/generate_true_size_18frame.py` here lays it out as an 18-frame
+  sheet, enlarges it (nearest neighbour) to Zygarde 50%'s size and draws the swimming sheet's foam
+  line.
 
 ## PMDCollab sprites
 

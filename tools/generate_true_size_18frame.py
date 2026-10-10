@@ -60,6 +60,10 @@ Usage:
     python3 tools/generate_true_size_18frame.py                        # bake everything
     python3 tools/generate_true_size_18frame.py --kind hgss --species 1,4,7
     python3 tools/generate_true_size_18frame.py --species-override 352:2,1,3
+
+Alternate forms come from tools/form_art_map.py: raw grids (FORM_ART) and, for a few,
+a pokeemerald-expansion checkout's follower strip (EMERALD_FORM_ART, see bake_emerald;
+skipped when no checkout is found).
 """
 from __future__ import annotations
 
@@ -71,7 +75,7 @@ from PIL import Image, ImageChops, ImageStat
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from form_art_map import FORM_ART, GEN9_FOLLOWERS  # noqa: E402
+from form_art_map import EMERALD_FORM_ART, FORM_ART, GEN9_FOLLOWERS, POKEEMERALD  # noqa: E402
 
 FORM_PREFERENCE = ("b", "f", "m")  # "both" gender art preferred; gendered-only species fall back
 DIRECTION_ROW = {"down": 0, "left": 1, "up": 3}  # row 2 ("right") is never read
@@ -344,6 +348,185 @@ def bake_species(kind: str, dex: int, variant: str, override, report: bool,
     return {"image": sheet, "cell": (cw, ch), "detected": detected, "scale": scale}
 
 
+# ------------------------------------------------------------- pokeemerald forms
+# A form drawn by pokeemerald-expansion's followers (form_art_map.EMERALD_FORM_ART):
+# overworld.png is a 16-colour strip of eight 32x32 frames -- down A/B, up A/B,
+# left A/B, right A/B -- whose palette index 0 is the transparent colour; the
+# colours come from overworld_normal.pal / overworld_shiny.pal (JASC). The sheet is
+# enlarged (nearest neighbour) so the body stands as tall as the base species' own
+# HGSS sheet, so it is the right size with or without gen3-hd-sprites. The 18-frame layout has no right-facing frames (the renderer
+# mirrors left), so the strip's own right frames go unused. Its swimming sheet is
+# cut from the same frames the way the HGSS swim art is drawn: the body ends in a
+# bowl of foam, as much of it above the water as the base species' own swim sheet
+# shows, padded by WATER_PAD like the swimming pack.
+EMERALD_FRAME = 32
+EMERALD_FIRST = {"down": 0, "up": 2, "left": 4}  # frame A of each direction; B follows
+FOAM = (232, 232, 248, 255)
+
+
+def read_jasc(path: Path) -> list[tuple[int, int, int]]:
+    lines = path.read_text(encoding="utf-8").split()
+    if lines[:2] != ["JASC-PAL", "0100"]:
+        raise ValueError(f"{path}: not a JASC palette")
+    count = int(lines[2])
+    nums = [int(x) for x in lines[3:3 + count * 3]]
+    return [tuple(nums[i:i + 3]) for i in range(0, len(nums), 3)]
+
+
+def emerald_strip(folder: Path, variant: str) -> Image.Image | None:
+    """The overworld strip in `variant`'s colours, index 0 transparent."""
+    png, pal = folder / "overworld.png", folder / f"overworld_{variant}.pal"
+    if not (png.is_file() and pal.is_file()):
+        return None
+    src = Image.open(png)
+    if src.mode != "P":
+        raise ValueError(f"{png}: expected a paletted PNG")
+    colours = read_jasc(pal)
+    idx = src.load()
+    out = Image.new("RGBA", src.size, (0, 0, 0, 0))
+    px = out.load()
+    for y in range(src.height):
+        for x in range(src.width):
+            i = idx[x, y]
+            if i != 0 and i < len(colours):
+                px[x, y] = colours[i] + (255,)
+    return out
+
+
+def emerald_land_sheet(strip: Image.Image) -> Image.Image:
+    """The 18-frame sheet: stand = frame A; the walk alternates B and A (the GBA
+    follower's own two-frame walk); there is no running art, so the run reuses it."""
+    f = EMERALD_FRAME
+    tiles = {}
+    for direction, first in EMERALD_FIRST.items():
+        a = strip.crop((first * f, 0, (first + 1) * f, f))
+        b = strip.crop(((first + 1) * f, 0, (first + 2) * f, f))
+        tiles.update({(direction, "stand"): a, (direction, "walkA"): b, (direction, "walkB"): a,
+                      (direction, "runBase"): a, (direction, "runA"): b, (direction, "runB"): a})
+    sheet = Image.new("RGBA", (f, f * FRAME_COUNT), (0, 0, 0, 0))
+    for i, key in enumerate(OUTPUT_FRAMES):
+        sheet.paste(tiles[key], (0, i * f))
+    return sheet
+
+
+def stand_height(sheet: Image.Image) -> float | None:
+    """Median body height of the three standing frames of an 18-frame sheet."""
+    fh = sheet.height // FRAME_COUNT
+    hs = []
+    for i in range(3):
+        box = sheet.crop((0, i * fh, sheet.width, (i + 1) * fh)).getchannel("A").getbbox()
+        if box:
+            hs.append(box[3] - box[1])
+    return sorted(hs)[len(hs) // 2] if hs else None
+
+
+def swim_keep(out_root: Path, dex: int, variant: str) -> float:
+    """Share of the body the base species' own swim sheet shows (land vs swimming
+    standing height, less the swimming pack's padding); 0.75 without one."""
+    land = out_root / "hgss" / f"{dex:03d}-{variant}.png"
+    swim = out_root / "swimming" / f"{dex:03d}-{variant}.png"
+    if not (land.is_file() and swim.is_file()):
+        return 0.75
+    lh = stand_height(Image.open(land).convert("RGBA"))
+    sh = stand_height(Image.open(swim).convert("RGBA"))
+    if not (lh and sh):
+        return 0.75
+    return max(0.6, min(0.95, sh / lh))
+
+
+def emerald_swim_sheet(land: Image.Image, keep: float) -> Image.Image:
+    """Each frame cut at one shared waterline (`keep` of the body above it), its last
+    rows a foam bowl -- solid at the bottom, stepping out about 2 px per row to the
+    body's edge, foam on the ends -- then padded by WATER_PAD on every side."""
+    fw, fh = land.width, land.height // FRAME_COUNT
+    frames = [land.crop((0, i * fh, fw, (i + 1) * fh)) for i in range(FRAME_COUNT)]
+    cuts = []
+    for fr in frames:
+        box = fr.getchannel("A").getbbox()
+        if box:
+            cuts.append(box[1] + keep * (box[3] - box[1]))
+    w = round(sorted(cuts)[len(cuts) // 2]) if cuts else fh
+    w = max(3, min(fh, w))
+    widths = []
+    for fr in frames:
+        row = [x for x in range(fw) if fr.getpixel((x, max(0, w - 3)))[3] > 0]
+        if row:
+            widths.append(row[-1] - row[0] + 1)
+    depth = 3 if widths and sorted(widths)[len(widths) // 2] >= 14 else 2
+    cw, ch = fw + 2 * WATER_PAD, w + 2 * WATER_PAD
+    out = Image.new("RGBA", (cw, ch * FRAME_COUNT), (0, 0, 0, 0))
+    for i, fr in enumerate(frames):
+        cut = fr.crop((0, 0, fw, w))
+        px = cut.load()
+        top = w - depth
+        xs = [x for y in range(max(0, top - 1), top + 1) for x in range(fw) if px[x, y][3] > 0]
+        if xs:
+            left, right = min(xs), max(xs)
+            step = min(2.0, (right - left + 1) / 8.0)
+            edge = 2 if right - left + 1 >= 14 else 1
+            for k in range(depth):
+                lo, hi = left + round(k * step), right - round(k * step)
+                y = top + k
+                for x in range(fw):
+                    if x < lo or x > hi:
+                        px[x, y] = (0, 0, 0, 0)
+                    elif k == depth - 1 or x < lo + edge or x > hi - edge:
+                        px[x, y] = FOAM
+        out.paste(cut, (WATER_PAD, i * ch + WATER_PAD), cut)
+    return out
+
+
+def match_scale(out_root: Path, dex: int, land: Image.Image) -> float:
+    """How much to enlarge a form's sheet so its body stands as tall as its base
+    species' own land sheet (1 when there is none to compare with, or it is not
+    smaller). Baked into the art, so the size is right without gen3-hd-sprites."""
+    base = out_root / "hgss" / f"{dex:03d}-normal.png"
+    if not base.is_file():
+        return 1.0
+    want, have = stand_height(Image.open(base).convert("RGBA")), stand_height(land)
+    if not (want and have) or want <= have:
+        return 1.0
+    return want / have
+
+
+def scale_sheet(sheet: Image.Image, scale: float) -> Image.Image:
+    """Every frame enlarged by `scale`, nearest neighbour (crisp edges, a few rows and
+    columns doubled when the scale is not a whole number)."""
+    if scale == 1.0:
+        return sheet
+    fw, fh = sheet.width, sheet.height // FRAME_COUNT
+    nw, nh = round(fw * scale), round(fh * scale)
+    out = Image.new("RGBA", (nw, nh * FRAME_COUNT), (0, 0, 0, 0))
+    for i in range(FRAME_COUNT):
+        frame = sheet.crop((0, i * fh, fw, (i + 1) * fh)).resize((nw, nh), Image.NEAREST)
+        out.paste(frame, (0, i * nh))
+    return out
+
+
+def bake_emerald(out_root: Path, dex: int, form: str, folder: Path, force: bool, stats: dict) -> None:
+    """Writes hgss/ and swimming/ <dex3>-<form>-<normal|shiny>.png for one form,
+    enlarged to its base species' size (match_scale, from the normal sheet)."""
+    scale = None
+    for variant in ("normal", "shiny"):
+        strip = emerald_strip(folder, variant)
+        if strip is None:
+            stats["missing_source"] += 1
+            continue
+        land = emerald_land_sheet(strip)
+        if scale is None:
+            scale = match_scale(out_root, dex, land)
+        land = scale_sheet(land, scale)
+        # one waterline for both colours (the base species' normal sheets decide it)
+        for kind, sheet in (("hgss", land), ("swimming", emerald_swim_sheet(land, swim_keep(out_root, dex, "normal")))):
+            path = out_root / kind / f"{dex:03d}-{form}-{variant}.png"
+            if path.exists() and not force:
+                stats["skipped_existing"] += 1
+                continue
+            path.parent.mkdir(parents=True, exist_ok=True)
+            sheet.save(path, "PNG", optimize=True)
+            stats["written"] += 1
+
+
 # (kind, dex) -> (walkA_col, walkB_col, runBase_col). Pins a known-bad
 # auto-detection permanently, so a future full rebake (no --species-override
 # on the command line) doesn't regress it -- same escape-hatch idea as
@@ -469,6 +652,18 @@ def main() -> int:
                     continue
                 result["image"].save(out_path, "PNG", optimize=True)
                 stats["written"] += 1
+
+    # Forms drawn from a pokeemerald-expansion checkout (form_art_map.EMERALD_FORM_ART):
+    # land and swimming sheets. No checkout: skipped, the game draws its PMD / base art.
+    if "hgss" in kinds and not args.report:
+        for (dex, form), sub in EMERALD_FORM_ART.items():
+            if species_filter is not None and dex not in species_filter:
+                continue
+            folder = POKEEMERALD / "graphics" / "pokemon" / sub
+            if not folder.is_dir():
+                stats["missing_source"] += 2
+                continue
+            bake_emerald(out_root, dex, form, folder, args.force, stats)
 
     if args.report:
         print("\n(report mode: nothing written)")

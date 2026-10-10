@@ -46,23 +46,6 @@ return {
     description = "Off keeps normal colours. Undiscovered silhouettes species not yet caught in your Pokedex. All silhouettes every visible wild Pokemon.",
   },
   {
-    key = "shiny_rate",
-    label = "Shiny Rate",
-    type = "choice",
-    default = "native",
-    choices = {
-      { "Native", "native" },
-      { "1/4096", "r4096" },
-      { "1/2048", "r2048" },
-      { "1/1024", "r1024" },
-      { "1/500", "r500" },
-      { "1/100", "r100" },
-      { "1/10", "r10" },
-      { "All", "all" },
-    },
-    description = "Native keeps the real shiny chance the engine already rolled against your trainer id (no reroll). Each rate re-rolls a non-shiny encounter at that chance until it is shiny, keeping the same nature and gender. All always shows a shiny.",
-  },
-  {
     key = "species_sizes",
     label = "Species Sizes",
     type = "toggle",

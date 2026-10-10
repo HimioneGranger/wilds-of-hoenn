@@ -11,6 +11,11 @@
 -- level and personality, replace only the species" step Modern Spawns itself
 -- applies on Gen 3 (adapter substituteAfterRoll).
 --
+-- Shiny chains (Modern Spawns' src/chain.lua) ride along: the chained species
+-- may take the slot's place (chainSpeciesFor), and chainBonus says how likely an
+-- encounter of it is to be shiny and how many perfect stats it gets -- this mod
+-- applies those (lib/shiny.lua), since a Gen 3 shiny is engine-specific.
+--
 -- Soft integration, same as Wilds of Kanto Revival: no dependency. Absent,
 -- OFF, GEN 1, not a Gen 3 table shape, or no table for the map -> the engine's
 -- own encounter passes through untouched.
@@ -95,6 +100,13 @@ function Bridge.apply(mapId, terrain, enc)
     if species then return withSpecies(enc, species) end
   end
 
+  -- a shiny chain: the chained species, when the chain makes this encounter it
+  if type(api.chainSpeciesFor) == "function" then
+    local ok, id = pcall(api.chainSpeciesFor, mapId, kind)
+    local species = ok and internalFor(api, id) or nil
+    if species then return withSpecies(enc, species) end
+  end
+
   local ok, generated = pcall(api.drawFor, mapId, kind)
   if not (ok and type(generated) == "table" and type(generated.slots) == "table") then
     return enc
@@ -104,6 +116,25 @@ function Bridge.apply(mapId, terrain, enc)
   local species = slot and internalFor(api, slot.species)
   if not species then return enc end
   return withSpecies(enc, species)
+end
+
+-- ------- shiny chains (Modern Spawns counts them; this mod makes the shinies)
+
+--- What a shiny chain gives an encounter of engine species `species`:
+--- { shiny = chance, perfectIvs = n }, or nil (no chain, another species, no
+--- Modern Spawns or one without chains). Never throws.
+function Bridge.chainBonus(species)
+  local api = Bridge.api()
+  if not (api and type(api.chainBonus) == "function") then return nil end
+  local ok, bonus = pcall(api.chainBonus, species)
+  return (ok and type(bonus) == "table") and bonus or nil
+end
+
+--- A wild Pokemon fought outside a real battle (the Battler's overworld fights)
+--- counts toward the chain like a battle won.
+function Bridge.chainRecord(species, result)
+  local api = Bridge.api()
+  if api and type(api.chainRecord) == "function" then pcall(api.chainRecord, species, result) end
 end
 
 return Bridge

@@ -16,6 +16,7 @@ tests/actor_renderer_unit_test.lua
 tests/battle_trigger_unit_test.lua
 tests/behavior_unit_test.lua
 tests/cell_path_unit_test.lua
+tests/classic_encounters_test.lua
 tests/companion_unit_test.lua
 tests/config_unit_test.lua
 tests/encounter_source_unit_test.lua
@@ -52,6 +53,7 @@ tests/portrait_ui_unit_test.lua
 tests/reachability_unit_test.lua
 tests/reflection_unit_test.lua
 tests/renderer_factory_unit_test.lua
+tests/shiny_chain_test.lua
 tests/shiny_unit_test.lua
 tests/spawn_manager_unit_test.lua
 tests/sprite_atlas_unit_test.lua
@@ -80,6 +82,7 @@ docs/MANUAL_TEST.md
 
 # local notes and the README banner image (not needed to run)
 CLAUDE.md
+DEVELOPMENT.md
 WoH.png
 
 # local build output
@@ -88,6 +91,8 @@ dist/wilds-of-hoenn-v1.4.0-hgss-pmd.zip
 dist/wilds-of-hoenn-v1.4.0-hgss.zip
 dist/wilds-of-hoenn-v1.6.0-hgss-pmd.zip
 dist/wilds-of-hoenn-v1.6.0-hgss.zip
+dist/wilds-of-hoenn-v1.6.2-hgss-pmd.zip
+dist/wilds-of-hoenn-v1.6.2-hgss.zip
 release/wilds-of-hoenn-v1.0.1-hgss.zip
 release/wilds-of-hoenn-v1.1.0-hgss-pmd.zip
 release/wilds-of-hoenn-v1.1.0-hgss.zip

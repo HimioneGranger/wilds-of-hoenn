@@ -1,29 +1,21 @@
--- Gen 3 shiny for visible wild spawns: SHINY RATE option.
+-- Gen 3 shiny for wild encounters, and the shiny chain's bonus.
 --
 -- The real check stays the engine's own (pokemon.lua:1397, exposed via
 -- EnginePatch.isShiny): shinyValue = (otId ^ otSecretId) ^ (pHi ^ pLo) < 8,
 -- against the LIVE SAVE's trainer id -- a wild Pokemon's shininess depends
--- on who would catch it, same as real hardware. "native" rate is whatever
--- rollSweetScent already drew (no reroll). Every other tier (1/4096
--- through 1/10, and "all") rolls its OWN chance on top of that -- a
--- non-shiny encounter that hits the roll (or "all", unconditionally) gets
--- a constructive search for a personality that both passes the engine's
--- real shiny check AND keeps the original nature and gender, rather than
--- rerolling blind (which would need ~8192 average tries against the
--- engine's native 1/8192 odds). An encounter the engine's own roll
--- already marked shiny is always kept, regardless of tier -- the roll
--- below only ever ADDS shiny chances on top of the real one, never
--- removes the one the engine already gave. Matches Wilds of Kanto
--- Revival's SHINY RATE tiering.
+-- on who would catch it, same as real hardware. An encounter the engine
+-- already made shiny always stays shiny.
+--
+-- On top of that comes the shiny chain (Modern Spawns counts it, src/chain.lua
+-- there; the idea is TTiN's and Untamed Tohjo's): an encounter of the chained
+-- species gets `bonus.shiny` -- a chance that it is made shiny -- and
+-- `bonus.perfectIvs` stats at 31. Making it shiny is a constructive search for
+-- a personality that passes the engine's real check AND keeps the original
+-- nature and gender (boostedPersonality), not a blind reroll against the
+-- engine's 1/8192. Without Modern Spawns there is no bonus: native odds only.
 local V = ...
 
 local Shiny = {}
-
--- rate key -> reroll denominator (1 in N). "native" and "all" are handled
--- as special cases in rollForEncounter, not through this table.
-local RATE_DENOM = {
-  r4096 = 4096, r2048 = 2048, r1024 = 1024, r500 = 500, r100 = 100, r10 = 10,
-}
 
 -- 16-bit xor without the `bit` library (LuaJIT-only): standalone tests run
 -- under plain Lua 5.1, so this stays pure arithmetic. Inputs are masked to
@@ -72,40 +64,58 @@ function Shiny.boostedPersonality(basePersonality, otId, otSecretId, genderFn, m
   return nil
 end
 
---- Applies the SHINY RATE option to an already-generated encounter
---- (species, level, personality, ivs, roamer -- from
---- Encounters.rules().rollSweetScent). Mutates and returns `enc`. `enc.shiny`
---- is always set to true/false so callers never have to re-derive it.
-function Shiny.rollForEncounter(mod, enc)
-  if type(enc) ~= "table" or enc.personality == nil then return enc end
-  local Config = V.require("config")
-  local EnginePatch = V.require("engine_patch")
-  local rate = Config.shinyRate(mod)
-  local ids = EnginePatch.trainerIds() or { otId = 0, otSecretId = 0 }
-  -- The engine's own roll is never overridden to false -- every tier below
-  -- only ADDS a chance on top of it.
-  if EnginePatch.isShiny(enc.personality, ids.otId, ids.otSecretId) then
-    enc.shiny = true
-    return enc
+Shiny.STATS = { "hp", "atk", "def", "spe", "spa", "spd" }
+
+--- IVs rolled the way the engine's battle builder rolls a wild Pokemon's
+--- (src/core/game3/battle/init.lua:205): two 15-bit draws, three stats each.
+function Shiny.rollIvs(rng)
+  rng = rng or math.random
+  local a, b = rng(0, 32767), rng(0, 32767)
+  return {
+    hp = a % 32, atk = math.floor(a / 32) % 32, def = math.floor(a / 1024) % 32,
+    spe = b % 32, spa = math.floor(b / 32) % 32, spd = math.floor(b / 1024) % 32,
+  }
+end
+
+--- Gives `enc` `k` perfect stats (31) on random stats, the rest as they were
+--- (or rolled now when the encounter carries none -- Emerald and FireRed
+--- encounters do not; the battle builder uses the ones given). Pure but for
+--- `rng` (math.random's shape). Returns `enc`.
+function Shiny.ivFloor(enc, k, rng)
+  k = math.min(#Shiny.STATS, math.floor(tonumber(k) or 0))
+  if type(enc) ~= "table" or k <= 0 then return enc end
+  rng = rng or math.random
+  local ivs = {}
+  for key, v in pairs(type(enc.ivs) == "table" and enc.ivs or Shiny.rollIvs(rng)) do ivs[key] = v end
+  local order = {}
+  for i, key in ipairs(Shiny.STATS) do order[i] = key end
+  for i = #order, 2, -1 do
+    local j = rng(1, i)
+    order[i], order[j] = order[j], order[i]
   end
-  local hitRate = false
-  if rate == "all" then
-    hitRate = true
-  else
-    local denom = RATE_DENOM[rate] -- nil for "native" -> never hits, no reroll
-    hitRate = denom ~= nil and math.random(1, denom) == 1
-  end
-  if hitRate then
-    local genderFn = function(p) return EnginePatch.genderOf(enc.species, p) end
-    local p = Shiny.boostedPersonality(enc.personality, ids.otId, ids.otSecretId, genderFn)
-    if p then
-      enc.personality = p
-      enc.shiny = true
-      return enc
-    end
-  end
-  enc.shiny = false
+  for i = 1, k do ivs[order[i]] = 31 end
+  enc.ivs = ivs
   return enc
+end
+
+--- Settles whether `enc` (species, level, personality ...) is shiny: the
+--- engine's own answer, else the chain's chance (`bonus` from Modern Spawns'
+--- chainBonus, nil = none), and applies the chain's perfect stats. Mutates and
+--- returns `enc`; `enc.shiny` is always set to true / false.
+function Shiny.rollForEncounter(enc, bonus, rng)
+  if type(enc) ~= "table" or enc.personality == nil then return enc end
+  rng = rng or math.random
+  local EnginePatch = V.require("engine_patch")
+  local ids = EnginePatch.trainerIds() or { otId = 0, otSecretId = 0 }
+  enc.shiny = EnginePatch.isShiny(enc.personality, ids.otId, ids.otSecretId) == true
+  if type(bonus) ~= "table" then return enc end
+  local chance = tonumber(bonus.shiny) or 0
+  if not enc.shiny and chance > 0 and rng() < chance then
+    local p = Shiny.boostedPersonality(enc.personality, ids.otId, ids.otSecretId,
+      function(x) return EnginePatch.genderOf(enc.species, x) end)
+    if p then enc.personality, enc.shiny = p, true end
+  end
+  return Shiny.ivFloor(enc, bonus.perfectIvs, rng)
 end
 
 return Shiny

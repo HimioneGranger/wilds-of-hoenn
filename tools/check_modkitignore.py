@@ -41,8 +41,8 @@ EXCLUDED_DIRS = [
 ]
 # local build output (names change with every build, so these go stale harmlessly)
 BUILD_DIRS = ["dist", "release"]
-# local notes and the README banner image
-EXCLUDED_FILES = ["CLAUDE.md", "WoH.png"]
+# local notes, the developer guide and the README banner image
+EXCLUDED_FILES = ["CLAUDE.md", "DEVELOPMENT.md", "WoH.png"]
 
 SKIP_DIR_NAMES = {"__pycache__", ".git", ".modkit", ".vscode"}
 

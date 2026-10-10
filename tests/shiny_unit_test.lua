@@ -94,70 +94,86 @@ if p2 then
   eq(p2 % 25, baseNoGender % 25, "no-gender result preserves nature")
 end
 
--- ------- rollForEncounter: native keeps whatever the engine's own check
--- says, never rerolls
-local Config = V.require("config")
-local mod = { options = { get = function(_, k) if k == "shiny_rate" then return "native" end end } }
+-- ------- rollForEncounter: without a chain, only the engine's own shiny
 fakeEngine.isShiny = function(_p, _otId, _otSecretId) return true end
 local enc = { species = 25, level = 10, personality = 1 }
-Shiny.rollForEncounter(mod, enc)
-eq(enc.shiny, true, "native rate surfaces a genuinely-shiny engine roll")
-eq(enc.personality, 1, "native rate never changes personality")
-
+Shiny.rollForEncounter(enc, nil)
+eq(enc.shiny, true, "an engine-shiny roll stays shiny")
+eq(enc.personality, 1, "...untouched")
 fakeEngine.isShiny = function(_p, _otId, _otSecretId) return false end
 enc = { species = 25, level = 10, personality = 1 }
-Shiny.rollForEncounter(mod, enc)
-eq(enc.shiny, false, "native rate never rerolls a non-shiny encounter")
-eq(enc.personality, 1, "native rate never touches personality on a miss")
+Shiny.rollForEncounter(enc, nil)
+eq(enc.shiny, false, "no chain: a non-shiny roll stays non-shiny (native odds only)")
+eq(enc.personality, 1, "...untouched")
+eq(enc.ivs, nil, "...and no IVs are added")
 
--- ------- rollForEncounter: a rate tier (e.g. 1/10) rerolls a non-shiny
--- encounter into a genuine shiny when its own chance hits -- math.random
--- is overridden here for determinism, same technique as a seeded rng
--- elsewhere in this file, since the real call site uses the bare global.
--- The override targets ONLY the rate-tier roll's exact call shape
--- (math.random(1, denom)), not boostedPersonality's own internal draws
--- (math.random(0, 65535) -- note the 0, not 1, as the first argument),
--- which must keep behaving randomly or its search never converges.
-local realRandom = math.random
-mod = { options = { get = function(_, k) if k == "shiny_rate" then return "r10" end end } }
+-- ------- rollForEncounter: a chain's shiny chance
 fakeEngine.isShiny = function(p, otId, otSecretId) return realIsShiny(p, otId, otSecretId) end
 fakeEngine.trainerIds = function() return { otId = 7, otSecretId = 11 } end
-math.random = function(a, b)
-  if a == 1 and b ~= nil then return 1 end -- force every rate-tier roll to hit
-  return realRandom(a, b)
-end
 math.randomseed(3)
 enc = { species = 25, level = 10, personality = 12345 }
-local originalNature = enc.personality % 25
-Shiny.rollForEncounter(mod, enc)
-math.random = realRandom
-eq(enc.shiny, true, "a rate tier turns a non-shiny roll shiny when its chance hits")
-eq(enc.personality % 25, originalNature, "rate-tier reroll preserves nature")
-check(realIsShiny(enc.personality, 7, 11), "rate-tier result is genuinely shiny for the trainer")
+local nature = enc.personality % 25
+Shiny.rollForEncounter(enc, { shiny = 1, perfectIvs = 0 }, function(a, b)
+  if a == nil then return 0 end -- the chance draw: always hits
+  return math.random(a, b)
+end)
+eq(enc.shiny, true, "a chain's chance that hits makes it shiny")
+eq(enc.personality % 25, nature, "...keeping its nature")
+check(realIsShiny(enc.personality, 7, 11), "...genuinely shiny for this trainer")
+eq(enc.ivs, nil, "no perfect stats asked: IVs left to the engine")
 
--- ------- rollForEncounter: a rate tier leaves the encounter alone when
--- its own chance misses
 fakeEngine.isShiny = function(_p, _otId, _otSecretId) return false end
-math.random = function(a, b)
-  if a == 1 and b ~= nil then return 2 end -- force every rate-tier roll to miss (denom >= 2)
-  return realRandom(a, b)
-end
 enc = { species = 25, level = 10, personality = 999 }
-Shiny.rollForEncounter(mod, enc)
-math.random = realRandom
-eq(enc.shiny, false, "a rate tier leaves the encounter alone when its chance misses")
-eq(enc.personality, 999, "a missed reroll never touches personality")
+Shiny.rollForEncounter(enc, { shiny = 0.5, perfectIvs = 0 }, function(a, b)
+  if a == nil then return 0.9 end -- misses
+  return math.random(a, b)
+end)
+eq(enc.shiny, false, "a chance that misses leaves it alone")
+eq(enc.personality, 999, "...personality untouched")
 
--- ------- rollForEncounter: "all" always forces shiny, no roll needed
-mod = { options = { get = function(_, k) if k == "shiny_rate" then return "all" end end } }
-fakeEngine.isShiny = function(p, otId, otSecretId) return realIsShiny(p, otId, otSecretId) end
-math.randomseed(3)
-enc = { species = 25, level = 10, personality = 54321 }
-local allNature = enc.personality % 25
-Shiny.rollForEncounter(mod, enc)
-eq(enc.shiny, true, "all rate always turns a non-shiny roll shiny")
-eq(enc.personality % 25, allNature, "all rate preserves nature")
-check(realIsShiny(enc.personality, 7, 11), "all rate result is genuinely shiny for the trainer")
+-- ------- the stat floor
+local function count31(ivs)
+  local n = 0
+  for _, k in ipairs(Shiny.STATS) do if ivs[k] == 31 then n = n + 1 end end
+  return n
+end
+local zero = function(a, b) if a == nil then return 0.9 end return a end -- lowest IVs, no shuffle
+enc = { species = 25, level = 10, personality = 5 }
+Shiny.ivFloor(enc, 2, zero)
+check(type(enc.ivs) == "table", "an encounter without IVs gets them rolled the engine's way")
+eq(count31(enc.ivs), 2, "...with 2 perfect stats")
+for _, k in ipairs(Shiny.STATS) do
+  check(enc.ivs[k] >= 0 and enc.ivs[k] <= 31, "IV " .. k .. " in 0..31")
+end
+enc = { ivs = { hp = 4, atk = 5, def = 6, spe = 7, spa = 8, spd = 9 } }
+Shiny.ivFloor(enc, 3, math.random)
+eq(count31(enc.ivs), 3, "3 perfect stats on given IVs")
+local kept = 0
+for k, v in pairs({ hp = 4, atk = 5, def = 6, spe = 7, spa = 8, spd = 9 }) do
+  if enc.ivs[k] == v then kept = kept + 1 end
+end
+eq(kept, 3, "...the other 3 kept as they were")
+enc = { ivs = { hp = 1 } }
+Shiny.ivFloor(enc, 0, math.random)
+eq(enc.ivs.hp, 1, "0 perfect stats changes nothing")
+enc = {}
+Shiny.ivFloor(enc, 9, math.random)
+eq(count31(enc.ivs), 6, "never more than all six")
+local seen = {}
+for _ = 1, 200 do
+  local e = { ivs = { hp = 0, atk = 0, def = 0, spe = 0, spa = 0, spd = 0 } }
+  Shiny.ivFloor(e, 1, math.random)
+  for k, v in pairs(e.ivs) do if v == 31 then seen[k] = true end end
+end
+local all = true
+for _, k in ipairs(Shiny.STATS) do if not seen[k] then all = false end end
+check(all, "the perfect stat can land on any of the six")
+
+-- rollForEncounter applies the floor with the chain's bonus
+fakeEngine.isShiny = function() return false end
+enc = { species = 25, level = 10, personality = 77 }
+Shiny.rollForEncounter(enc, { shiny = 0, perfectIvs = 1 })
+eq(count31(enc.ivs) >= 1, true, "rollForEncounter gives the chain's perfect stats")
 
 print("")
 if failures > 0 then

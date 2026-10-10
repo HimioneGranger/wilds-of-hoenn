@@ -304,9 +304,16 @@ every 15 s).
 - [ ] Silhouette Off/Undiscovered/All: Undiscovered flips to normal color
       immediately after catching that species; All silhouettes every
       visible spawn regardless of Pokedex state.
-- [ ] Shiny Rate Vanilla/Boosted/Off: Boosted should produce a visibly
-      shiny wild Pokemon noticeably more often than Vanilla; a shiny wild
-      Pokemon shows its shiny sheet and is the same shiny in battle.
+- [ ] No SHINY RATE option any more. Without Modern Spawns: shinies at the
+      game's own odds; a shiny wild Pokemon shows its shiny sheet and is the
+      same shiny in battle.
+- [ ] Shiny chains (with Modern Spawns): beat or catch one species in a row
+      on a route -- it turns up more (every encounter from 9 in a row),
+      visible spawns and step encounters alike; at 10 / 25 / 40 in a row its
+      summary shows 1 / 2 / 3 maxed stats; the Battler's overworld wins count;
+      running from it or blacking out ends the chain; another species starts
+      a new one; Modern Spawns' SHINY CHAINS OFF stops all of it (nothing
+      counted, no extra spawns / shinies / stats) and ON resumes the kept chain.
 - [x] The companion (no on/off option any more): the party lead follows
       until you pick another Pokemon / role in the party menu; changing who
       is out swaps the follower's sprite within a tick or two. (confirmed the

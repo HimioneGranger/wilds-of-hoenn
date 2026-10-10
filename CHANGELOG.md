@@ -1,5 +1,33 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- **Shiny chains** (needs [Modern Spawns](https://github.com/poooooby/g1r_modern_spawns)).
+  Win or catch the same species again and again and the chain grows:
+  - It turns up more often wherever it lives: 1 in 8 encounters at a chain of 2, every encounter
+    from 9. This covers visible spawns and Classic Encounters alike.
+  - It's more likely to be shiny: about 1 in 82 at a chain of 100.
+  - It has better stats: 1 / 2 / 3 perfect stats from a chain of 10 / 25 / 40.
+  - Wins by your Battler companion count too.
+  - Running from it or blacking out ends the chain, and another species starts a new one.
+  - Switch it off with Modern Spawns' **SHINY CHAINS** option (default ON). A chain in progress is
+    kept for when it's back on.
+
+  Modern Spawns keeps the count; Wilds makes the shiny, keeping its nature and gender. Inspired by
+  TTiN and Untamed Tohjo, used with permission.
+
+- **Zygarde 100% (Complete Forme) has its own HGSS / PokeMMO sprite**, normal and shiny, on
+  land and swimming. It's baked from pokeemerald-expansion's follower sprite and palettes,
+  enlarged to the same size as Zygarde 50%, with or without Gen 3 HD Sprites. Before, it fell
+  back to PMDCollab or base Zygarde art.
+
+### Changed
+
+- **The SHINY RATE option is gone, replaced by shiny chains.** Without Modern Spawns, wild
+  Pokemon keep the game's own shiny odds. A saved SHINY RATE setting is simply ignored.
+
 ## 1.6.2 (2026-10-10)
 
 Includes everything from 1.6.2-beta.1 (below).

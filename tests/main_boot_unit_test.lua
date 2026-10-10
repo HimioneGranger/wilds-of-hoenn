@@ -185,6 +185,31 @@ withFakeEngine(completeFakeEngine("rse"), function()
     if name == "world.follower.spawn" then sawFollowerSpawn = true end
   end
   check(sawEncounterRoll, "RSE boot: encounter.roll hook registered")
+
+  -- shiny chains on classic encounters: the encounter.species wrap
+  local speciesWrap = mod._wraps["encounter.species"]
+  check(type(speciesWrap) == "function", "RSE boot: encounter.species hook registered (shiny chains)")
+  if speciesWrap then
+    local rolled = { species = "TREECKO", speciesId = 277, level = 5, personality = 3 }
+    local same = speciesWrap(function() return rolled end, rolled, {})
+    check(same == rolled and rolled.ivs == nil, "no Modern Spawns: the step encounter is left alone")
+    mod.find = function(_, id)
+      if id ~= "modern_spawns" then return nil end
+      return { exports = {
+        apiVersion = 1, isActive = function() return true end, generation = function() return 3 end,
+        drawFor = function() return nil end, profileOf = function() return nil end,
+        chainBonus = function(sp) if sp == 277 then return { shiny = 0, perfectIvs = 2 } end end,
+      } }
+    end
+    local chained = speciesWrap(function() return { species = 277, speciesId = 277, level = 5, personality = 3 } end, {}, {})
+    local perfect = 0
+    for _, v in pairs(chained.ivs or {}) do if v == 31 then perfect = perfect + 1 end end
+    eq(perfect >= 2, true, "a chained step encounter gets its perfect stats")
+    eq(chained.personality, 3, "...and keeps its personality when the shiny chance misses")
+    local other = speciesWrap(function() return { species = 300, speciesId = 300, level = 5, personality = 3 } end, {}, {})
+    eq(other.ivs, nil, "another species is left alone")
+    mod.find = nil
+  end
   check(sawFollowerSpawn, "RSE boot: world.follower.spawn hook registered")
   check(mod._events["map.entered"] ~= nil, "RSE boot: map.entered subscribed")
   check(mod._events["map.exited"] ~= nil, "RSE boot: map.exited subscribed")

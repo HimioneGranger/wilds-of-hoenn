@@ -120,3 +120,16 @@ from pathlib import Path as _Path
 GEN9_FOLLOWERS = _Path(_os.environ.get("GEN9_FOLLOWERS") or
     _Path(__file__).resolve().parent.parent.parent / "1SpriteReferences" / "Gen 9 Pack"
     / "Graphics" / "Characters" / "Followers")
+
+# Forms whose HGSS-style art comes from a pokeemerald-expansion checkout instead
+# (rh-hideout/pokeemerald-expansion, a sibling ../pokeemerald-expansion or
+# $POKEEMERALD): (dex, form) -> its graphics/pokemon/<folder>/, which holds
+# overworld.png (eight 32x32 frames: down A/B, up A/B, left A/B, right A/B) and
+# overworld_normal.pal / overworld_shiny.pal. Baked by
+# tools/generate_true_size_18frame.py (bake_emerald) into the land and swimming
+# 18-frame sheets; credited in THIRD_PARTY_NOTICES.md.
+POKEEMERALD = _Path(_os.environ.get("POKEEMERALD") or
+    _Path(__file__).resolve().parent.parent.parent / "pokeemerald-expansion")
+EMERALD_FORM_ART = {
+    (718, "complete"): "zygarde/complete",  # Zygarde 100% (Complete Forme)
+}

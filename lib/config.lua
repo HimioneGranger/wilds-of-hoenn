@@ -8,7 +8,6 @@ Config.DEFAULTS = {
   sprite_style = "pmd",
   classic_enc = true,
   wild_silhouettes = "off",
-  shiny_rate = "native",
   overworld_size = "100",
   species_sizes = true,
 }
@@ -324,20 +323,6 @@ function Config.silhouetteMode(mod)
   local v = optGet(mod, "wild_silhouettes")
   if VALID_SILHOUETTE[v] then return v end
   return Config.DEFAULTS.wild_silhouettes
-end
-
--- "native" = trust whatever the engine's own roll already decided (no
--- reroll). "rNNNN" = reroll a non-shiny encounter at that chance (see
--- lib/shiny.lua's RATE_DENOM). "all" = always shiny. Matches Wilds of
--- Kanto Revival's SHINY RATE tiering; no "off" -- see options.lua.
-local VALID_SHINY_RATE = {
-  native = true, r4096 = true, r2048 = true, r1024 = true, r500 = true, r100 = true, r10 = true,
-  all = true,
-}
-function Config.shinyRate(mod)
-  local v = optGet(mod, "shiny_rate")
-  if VALID_SHINY_RATE[v] then return v end
-  return Config.DEFAULTS.shiny_rate
 end
 
 --- There is no Follower option any more: a companion is always out (who, and

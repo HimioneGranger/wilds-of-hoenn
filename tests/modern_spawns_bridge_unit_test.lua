@@ -127,6 +127,59 @@ other = makeOther()
 other.exports.drawFor = function() error("boom") end
 check(Bridge.apply("ROUTE_101", "land", e) == e, "an erroring API falls through to the engine's encounter")
 
+-- ------- shiny chains
+do
+  active, generation = true, 3
+  legendary = nil
+  other = makeOther()
+  -- an older Modern Spawns without chains: nothing changes, nothing breaks
+  eq(Bridge.chainBonus(1019), nil, "no chain exports: no bonus")
+  check(pcall(Bridge.chainRecord, 1019, "win"), "no chain exports: recording is a harmless no-op")
+  eq(Bridge.apply("ROUTE_101", "land", enc(261, 2)).species, 1019, "...and spawns are as before")
+
+  local forced, recorded, asked = nil, {}, {}
+  other.exports.chainSpeciesFor = function(mapId, terrain) asked[#asked + 1] = terrain return forced end
+  other.exports.chainBonus = function(species)
+    if species == 1143 then return { shiny = 0.25, perfectIvs = 2 } end
+    return nil
+  end
+  other.exports.chainRecord = function(species, result) recorded[#recorded + 1] = { species, result } end
+
+  forced = "SNORLAX"
+  local out = Bridge.apply("ROUTE_101", "land", enc(261, 4))
+  eq(out.species, 1143, "the chained species takes the slot's place (national 143)")
+  eq(out.level, 4, "...at the rolled level")
+  eq(out.personality, 77, "...same personality")
+  eq(asked[#asked], "grass", "it is asked with the bridge's terrain name")
+  legendary = "PIDGEY"
+  eq(Bridge.apply("ROUTE_101", "land", enc(261, 4)).species, 1016, "a legendary roll still comes first")
+  legendary = nil
+  forced = nil
+  eq(Bridge.apply("ROUTE_101", "land", enc(261, 4)).species, 1016, "no forced species: the slot swap as usual")
+  forced = "NOPE"
+  eq(Bridge.apply("ROUTE_101", "land", enc(261, 4)).species, 1016, "a forced species the engine lacks is skipped")
+  forced = nil
+  local roamer = enc(380, 40, { roamer = true })
+  forced = "SNORLAX"
+  eq(Bridge.apply("ROUTE_101", "land", roamer).species, 380, "a roamer is never chained away")
+  forced = nil
+
+  local b = Bridge.chainBonus(1143)
+  check(b and b.shiny == 0.25 and b.perfectIvs == 2, "chainBonus passes Modern Spawns' answer through")
+  eq(Bridge.chainBonus(1019), nil, "...nil for another species")
+  Bridge.chainRecord(1143, "win")
+  check(recorded[1] and recorded[1][1] == 1143 and recorded[1][2] == "win", "chainRecord reaches Modern Spawns")
+  other.exports.chainBonus = function() error("boom") end
+  eq(Bridge.chainBonus(1143), nil, "a failing export answers nil, never throws")
+  active = false
+  other.exports.chainBonus = function() return { shiny = 1 } end
+  eq(Bridge.chainBonus(1143), nil, "Modern Spawns inactive: no chain")
+  other = nil
+  eq(Bridge.chainBonus(1143), nil, "not installed: no chain")
+  active = true
+  other = makeOther()
+end
+
 if failures > 0 then
   io.stderr:write(failures .. " failure(s)\n")
   os.exit(1)

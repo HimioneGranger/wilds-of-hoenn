@@ -68,6 +68,8 @@ return function(mod)
   local OverworldBattle = V.require("overworld_battle")
   local PartyRoles = V.require("party_roles")
   local Reflection = V.require("reflection")
+  local ModernSpawns = V.require("modern_spawns_bridge")
+  local Shiny = V.require("shiny")
 
   Config.defineOptions(mod)
   HdField.setSpeciesSizes(Config.get(mod, "species_sizes"))
@@ -158,6 +160,7 @@ return function(mod)
     swimFree = EnginePatch.waterFree,
     occupied = function(x, y) return spawnManager:blocksCell(x, y) end,
     defeat = function(id) spawnManager:despawn(id) end,
+    chainRecord = ModernSpawns.chainRecord,
     playCry = EnginePatch.playCry,
     levelUp = function(mon, from, to) levelReady:record(mon, from, to) end,
     expFrozen = function(mon) return levelReady:pending(mon) ~= nil end,
@@ -278,6 +281,24 @@ return function(mod)
   mod.hooks:wrap("encounter.roll", function(next, tableForMap, ctx)
     if not Config.classicEncEnabled(mod) then return nil end
     return next()
+  end)
+
+  -- Shiny chains on classic step encounters: Modern Spawns (priority -100) has
+  -- already counted the chain and maybe swapped in the chained species; this
+  -- runs after it and makes the encounter shiny / gives it perfect stats (a Gen 3
+  -- shiny is this mod's job, lib/shiny.lua). Nothing without Modern Spawns.
+  mod.hooks:wrap("encounter.species", function(next, _enc, _ctx)
+    local out = next()
+    if type(out) ~= "table" then return out end
+    local species = tonumber(out.speciesId) or tonumber(out.species)
+    local bonus = species and ModernSpawns.chainBonus(species)
+    if not bonus then return out end
+    -- FireRed / LeafGreen roll no personality: draw it now so it can be made shiny
+    if out.personality == nil then out.personality = EnginePatch.randomPersonality() end
+    local probe = { species = species, personality = out.personality, ivs = out.ivs }
+    Shiny.rollForEncounter(probe, bonus)
+    out.personality, out.ivs = probe.personality, probe.ivs
+    return out
   end)
 
   -- Party follower: the engine's public seam, no patching needed.

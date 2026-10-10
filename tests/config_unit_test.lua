@@ -56,7 +56,6 @@ eq(Config.spriteStyle(mod), "pmd", "sprite_style defaults to pmd when PMDCollab 
 eq(Config.spriteStyle(modNoPmd), "pokemmo", "...and to HGSS / PokeMMO when it is not (the HGSS-only release)")
 eq(Config.classicEncEnabled(mod), true, "classic_enc defaults true")
 eq(Config.silhouetteMode(mod), "off", "silhouette defaults off")
-eq(Config.shinyRate(mod), "native", "shiny_rate defaults native")
 eq(Config.followerEnabled(mod), true, "a companion is always allowed (no Follower option any more)")
 
 -- ------- saved values override defaults
@@ -71,8 +70,6 @@ optionStore.classic_enc = false
 eq(Config.classicEncEnabled(mod), false, "classic_enc reads saved false")
 optionStore.wild_silhouettes = "all"
 eq(Config.silhouetteMode(mod), "all", "silhouette reads saved all")
-optionStore.shiny_rate = "r4096"
-eq(Config.shinyRate(mod), "r4096", "shiny_rate reads saved r4096")
 optionStore.follower = false -- a stale saved value from before the option was removed
 eq(Config.followerEnabled(mod), true, "...is ignored")
 
@@ -80,8 +77,6 @@ eq(Config.followerEnabled(mod), true, "...is ignored")
 -- propagating garbage into renderer/spawn logic
 optionStore.wild_silhouettes = "bogus"
 eq(Config.silhouetteMode(mod), "off", "silhouette rejects invalid value")
-optionStore.shiny_rate = "bogus"
-eq(Config.shinyRate(mod), "native", "shiny_rate rejects invalid value")
 optionStore.sprite_style = "bogus"
 eq(Config.spriteStyle(mod), "pmd", "sprite_style rejects invalid value")
 optionStore.sprite_style = "followers"
@@ -118,7 +113,7 @@ for _, row in ipairs(definedSchema or {}) do
   byKey[row.key] = row
   check(#row.label <= 14, "label <=14: " .. tostring(row.label))
 end
-for _, key in ipairs({ "enabled", "sprite_style", "classic_enc", "wild_silhouettes", "shiny_rate" }) do
+for _, key in ipairs({ "enabled", "sprite_style", "classic_enc", "wild_silhouettes" }) do
   check(byKey[key] ~= nil, "schema has " .. key)
   eq(byKey[key].default, Config.DEFAULTS[key], "schema default matches Config.DEFAULTS for " .. key)
 end

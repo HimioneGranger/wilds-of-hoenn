@@ -161,11 +161,12 @@ function SpawnManager:_spawnOne(terrain, cell)
 end
 
 -- Puts an already rolled encounter on `cell` as a visible wild Pokemon.
--- `keepShiny` skips the SHINY RATE roll (the encounter's own `shiny` stands).
+-- `keepShiny` skips the shiny roll (the encounter's own `shiny` stands).
 function SpawnManager:_place(terrain, cell, enc, keepShiny)
   local dex = FormSource.artKeyFor(self.mod, enc.species)
   if not dex then return false end
-  if not keepShiny then enc = Shiny.rollForEncounter(self.mod, enc) end
+  -- the engine's own shiny, plus a shiny chain's bonus (Modern Spawns)
+  if not keepShiny then enc = Shiny.rollForEncounter(enc, ModernSpawns.chainBonus(enc.species)) end
 
   local id = self.nextId
   self.nextId = id + 1

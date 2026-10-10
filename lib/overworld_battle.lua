@@ -41,6 +41,7 @@ local CELL = 16
 ---   swimFree(x, y) -> bool      optional: a water cell it can swim through
 ---   occupied(x, y) -> bool      optional: a wild Pokemon is there
 ---   defeat(id)                  remove a defeated wild Pokemon
+---   chainRecord(species, result) optional: count a win toward a shiny chain
 ---   playCry(species)            the engine cry
 ---   rng() -> [0,1)              optional
 ---   cfg                         optional (Config.OW_BATTLE)
@@ -408,6 +409,8 @@ function OverworldBattle:_mode_win(env)
     end
     local id = e.id
     self:_release()
+    -- an overworld win counts toward a shiny chain like a battle won
+    if self.deps.chainRecord then pcall(self.deps.chainRecord, e.species, "win") end
     if self.deps.defeat then self.deps.defeat(id) end
     self.fight, self.wild = nil, nil
     self.popup, self.popupAge = text, 0

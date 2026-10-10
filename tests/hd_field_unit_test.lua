@@ -156,6 +156,17 @@ do
   check(HdField.quadPivot({}, swimQuad, 1, 2) == false, "an untagged image is left alone")
 end
 
+-- Zygarde Complete's sheet is baked at Zygarde 50's size, so it takes the base species' factor
+do
+  local was = HdField.speciesSizes
+  HdField.setSpeciesSizes(true)
+  check(near(HdField.speciesFactor("assets/wilds_generated/true_size18/hgss/718-complete-normal.png"), 0.95),
+    "Zygarde Complete is sized like Zygarde 50 (its art is baked to match)")
+  check(near(HdField.speciesFactor("assets/wilds_generated/true_size18/swimming/718-complete-shiny.png"), 0.95),
+    "...swimming too")
+  HdField.setSpeciesSizes(was)
+end
+
 -- the table itself
 local n, lo, hi = 0, 9, 0
 for dex = 1, 1025 do
