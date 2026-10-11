@@ -8,7 +8,6 @@ Config.DEFAULTS = {
   sprite_style = "pmd",
   classic_enc = true,
   wild_silhouettes = "off",
-  overworld_size = "100",
   species_sizes = true,
 }
 

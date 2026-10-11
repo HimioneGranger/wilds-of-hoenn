@@ -3,10 +3,9 @@
 -- resolution instead of on the game's pixel grid, so they can be any size without
 -- lumpy pixels and walkers move smoothly between pixels.
 --
--- A sheet's size is  Overworld Size (the player's percentage, every sheet)
---                  x Species Sizes  (while that option is on), per style:
---                      HGSS / PokeMMO  lib/HGSS_scale.lua (Wilds of Kanto Revival's table)
---                      PMDCollab       lib/PMD_scale.lua (1.0 for every species until tuned)
+-- A sheet's size is its species' factor (while Species Sizes is on, else 1), per style:
+--   HGSS / PokeMMO  lib/HGSS_scale.lua (Wilds of Kanto Revival's table)
+--   PMDCollab       lib/PMD_scale.lua
 -- Both are plain dex -> size tables, edited by hand; a form key ("479-heat") sizes one form.
 --
 -- Without that mod, or with its Field HD option off, this does nothing and the sheets
@@ -26,7 +25,6 @@ end
 local SizeTables = { hgss = load("HGSS_scale"), pmd = load("PMD_scale") }
 local SpriteSource = load("sprite_source")
 
-HdField.size = 1             -- "Overworld Size", as a multiplier
 HdField.speciesSizes = true  -- "Species Sizes"
 local MIN_SCALE, MAX_SCALE = 0.2, 2
 
@@ -76,7 +74,7 @@ function HdField.speciesFactor(path)
 end
 
 local function scaleOf(spec)
-  return math.max(MIN_SCALE, math.min(MAX_SCALE, HdField.size * spec.factor))
+  return math.max(MIN_SCALE, math.min(MAX_SCALE, spec.factor))
 end
 
 -- a PMD sheet stands on its baked ground point, not on the bottom centre of its cell
@@ -157,15 +155,6 @@ local function rescale()
   end
 end
 
---- The "Overworld Size" option: a percentage ("100", "90", ...) -> the shared multiplier.
-function HdField.setSize(value)
-  local pct = tonumber(value)
-  if not pct or pct <= 0 then pct = 100 end
-  HdField.size = math.max(0.25, math.min(2, pct / 100))
-  rescale()
-  return HdField.size
-end
-
 --- The "Species Sizes" option (on / off) -- applies to sheets already loaded too.
 function HdField.setSpeciesSizes(on)
   HdField.speciesSizes = on ~= false
@@ -192,7 +181,7 @@ end
 --- caller spacing sprites out by their width has to use instead of the sheet's.
 function HdField.scaleOfPath(mod, path)
   if not HdField.active(mod) then return 1 end
-  return math.max(MIN_SCALE, math.min(MAX_SCALE, HdField.size * HdField.speciesFactor(path)))
+  return math.max(MIN_SCALE, math.min(MAX_SCALE, HdField.speciesFactor(path)))
 end
 
 return HdField

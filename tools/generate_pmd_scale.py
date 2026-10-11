@@ -121,7 +121,7 @@ def main() -> int:
             "-- 1.0 = the sprite's own size). Proposed by tools/generate_pmd_scale.py: each species",
             "-- is sized so its art is as big as its HGSS sprite is after lib/HGSS_scale.lua.",
             "-- Hand-tune any value; lib/hd_field.lua applies it (with the gen3-hd-sprites library,",
-            "-- Species Sizes on) about the sprite's ground point, multiplied by Overworld Size.",
+            "-- Species Sizes on) about the sprite's ground point.",
             "-- A form is sized like its base species; a form key (\"479-heat\") sizes one form.",
             "return {",
         ]

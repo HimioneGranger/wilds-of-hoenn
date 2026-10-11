@@ -66,7 +66,6 @@ A mod for [Gen1Recomp](https://github.com/bryanthaboi/gen1recomp)'s Generation 3
 | **Classic Enc** | On / Off | On | The original step-based grass and Surf encounters. Visible Pokémon stay either way; fishing and Rock Smash are unaffected. |
 | **Silhouette** | Off / Undiscovered / All | Off | Draws wild Pokémon as silhouettes: species you haven't caught, or all of them. |
 | **Species Sizes** | On / Off | On | Draws each species at its own relative size. Needs Gen 3 HD Sprites. |
-| **Overworld Size** | 100% to 50% | 100% | Scales wild Pokémon and your partner, on top of Species Sizes. Needs Gen 3 HD Sprites. |
 
 Shiny chains are switched on and off with Modern Spawns' **SHINY CHAINS** option.
 

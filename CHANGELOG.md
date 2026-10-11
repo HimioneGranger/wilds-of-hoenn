@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Removed
+
+- **The Overworld Size option.** With Gen 3 HD Sprites, each species is drawn at its hand-tuned
+  size (Species Sizes), so a global percentage on top was redundant. A saved Overworld Size
+  setting is simply ignored, and sprites are drawn at 100%.
+
 ## 1.7.0 (2026-10-10)
 
 ### Added

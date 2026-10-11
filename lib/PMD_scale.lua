@@ -6,7 +6,7 @@
 -- floor that rises from 0.49 (small species) to 0.8 (big ones), so a large Pokemon is not
 -- shrunk into a tiny, too-fine sprite. Species without both sprites stay at 1.0.
 -- Hand-tune any value; lib/hd_field.lua applies it (with the gen3-hd-sprites library and
--- Species Sizes on) about the sprite's ground point, multiplied by Overworld Size. A form
+-- Species Sizes on) about the sprite's ground point. A form
 -- is sized like its base species; a form key ("479-heat") sizes one form on its own.
 return {
   [1] = 0.51, -- Bulbasaur

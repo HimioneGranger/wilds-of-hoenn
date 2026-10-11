@@ -73,7 +73,6 @@ return function(mod)
 
   Config.defineOptions(mod)
   HdField.setSpeciesSizes(Config.get(mod, "species_sizes"))
-  HdField.setSize(Config.get(mod, "overworld_size"))
 
   -- Pure asset I/O, no engine dependency: safe to try regardless of game
   -- version. A repo checkout or --no-atlas build has no assets/atlas/
@@ -316,8 +315,6 @@ return function(mod)
       elseif ev.value ~= true then
         spawnManager:onMapExited()
       end
-    elseif ev.key == "overworld_size" then
-      HdField.setSize(ev.value)
     elseif ev.key == "species_sizes" then
       HdField.setSpeciesSizes(ev.value)
     elseif ev.key == "sprite_style" then

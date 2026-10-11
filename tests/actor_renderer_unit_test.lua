@@ -289,7 +289,7 @@ do
   local r = setmetatable({ mod = libMod }, ActorRenderer)
   r.imagePath = function() return "assets/wilds_generated/true_size18/hgss/006-normal.png" end
   r.frameWidth = function() return 40 end
-  Hd.setSize("100") Hd.setSpeciesSizes(true)
+  Hd.setSpeciesSizes(true)
   check(math.abs(r:visualWidth() - 40 * SS[6]) < 1e-9, "visualWidth = the sheet's width x its species size")
   Hd.setSpeciesSizes(false)
   eq(r:visualWidth(), 40, "...the sheet's own width with Species Sizes off")

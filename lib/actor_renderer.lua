@@ -265,7 +265,7 @@ function ActorRenderer:frameWidth()
 end
 
 --- The width the sprite is actually drawn at: the sheet's own width times the size
---- gen3-hd-sprites draws it at (Overworld Size x Species Sizes; 1 without that mod).
+--- gen3-hd-sprites draws it at (its Species Sizes factor; 1 without that mod).
 --- Spacing a follower out from the player goes by this, not by the sheet.
 function ActorRenderer:visualWidth()
   local path = self:imagePath()

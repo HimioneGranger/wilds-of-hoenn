@@ -52,19 +52,4 @@ return {
     default = true,
     description = "Draw each HGSS / PokeMMO species at its own relative size, the same table Wilds of Kanto Revival uses (a Charizard bigger than a Charmander, a Rattata small). Needs the Gen 3 HD Sprites mod (with its Field HD option on); without it every species is drawn at its sheet's size. PMDCollab sprites keep their own sizes.",
   },
-  {
-    key = "overworld_size",
-    label = "Overworld Size",
-    type = "choice",
-    default = "100",
-    choices = {
-      { "100%", "100" },
-      { "90%", "90" },
-      { "80%", "80" },
-      { "75%", "75" },
-      { "67%", "67" },
-      { "50%", "50" },
-    },
-    description = "Size of wild Pokemon and your follower in the overworld, on top of Species Sizes. Needs the Gen 3 HD Sprites mod (with its Field HD option on), which draws them at your screen's full resolution so any size keeps every pixel of the art; without it they are always drawn at 100%.",
-  },
 }

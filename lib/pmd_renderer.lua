@@ -165,8 +165,8 @@ function PmdRenderer:advanceAs(anim, speed)
   self.clock = self.clock + rate
 end
 
---- The size gen3-hd-sprites draws this sprite at on top of its own (Overworld Size x
---- Species Sizes, lib/hd_field.lua); 1 without that mod.
+--- The size gen3-hd-sprites draws this sprite at on top of its own (its Species
+--- Sizes factor, lib/hd_field.lua); 1 without that mod.
 function PmdRenderer:hdScale()
   local path = SpriteSource.pmdPath(self.info, "walk", self.dex, self.shiny)
   return path and HdField.scaleOfPath(self.mod, path) or 1

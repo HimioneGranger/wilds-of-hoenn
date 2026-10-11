@@ -38,7 +38,6 @@ local lib = { exports = {
   enabled = function(pass) return pass ~= "field" or fieldOn end,
 } }
 local mod = { find = function(_, id) return id == "gen3-hd-sprites" and lib or nil end }
-HdField.setSize("100")
 HdField.setSpeciesSizes(true)
 
 local charmander, charizard, snorlaxPmd, rotom = {}, {}, {}, {}
@@ -59,16 +58,7 @@ local swim = {}
 HdField.tag(mod, swim, "assets/wilds_generated/true_size18/swimming/130-shiny.png")
 check(near(tagged[5].spec.scale, SpeciesScale[130]), "water sheets are sized by species too")
 
--- Overworld Size multiplies on top, and loaded sheets follow
-check(HdField.setSize("50") == 0.5, "Overworld Size 50% -> 0.5")
-check(near(tagged[2].spec.scale, SpeciesScale[6] * 0.5), "...times the species size on a loaded sheet")
-check(near(tagged[3].spec.scale, 0.5), "...and alone on a PMDCollab sheet")
-check(HdField.setSize("100") == 1, "100% -> 1")
-check(HdField.setSize(nil) == 1 and HdField.setSize("junk") == 1, "a bad value is 100%")
-check(HdField.setSize("10") == 0.25, "clamped to at least 25%")
-HdField.setSize("100")
-
--- Species Sizes off: every sheet is back to the global size only
+-- Species Sizes off: every sheet is drawn at its own size
 HdField.setSpeciesSizes(false)
 check(tagged[1].spec.scale == 1 and tagged[2].spec.scale == 1, "Species Sizes off -> sheets already loaded go back to 1")
 local late = {}
@@ -86,7 +76,7 @@ fieldOn = true
 -- ------- the two tables are the tuning files: editing one changes that style only
 do
   local HG, PM = V.require("HGSS_scale"), V.require("PMD_scale")
-  HdField.setSize("100") HdField.setSpeciesSizes(true)
+  HdField.setSpeciesSizes(true)
   local sheet, formSheet, pmdSheet = {}, {}, {}
   HdField.tag(mod, sheet, HGSS:format("006"))
   HdField.tag(mod, formSheet, "assets/wilds_generated/true_size18/hgss/479-heat-normal.png")
@@ -111,12 +101,10 @@ do
   check(near(specOf(pmdSheet).scale, 0.85), "editing PMD_scale sizes a PMDCollab sheet")
   check(near(HdField.scaleOfPath(mod, PMD:format("150")), 0.85), "...and the size spacing goes by")
   check(near(specOf(sheet).scale, 0.5), "...without touching the hgss one")
-  HdField.setSize("50")
-  check(near(specOf(pmdSheet).scale, 0.425), "Overworld Size multiplies with an edited size")
   HdField.setSpeciesSizes(false)
-  check(specOf(pmdSheet).scale == 0.5 and specOf(sheet).scale == 0.5, "Species Sizes off ignores both tables")
+  check(specOf(pmdSheet).scale == 1 and specOf(sheet).scale == 1, "Species Sizes off ignores both tables")
   HG[6], HG["479-heat"], HG[479], PM[150] = was6, nil, was479, 1.0
-  HdField.setSize("100") HdField.setSpeciesSizes(true)
+  HdField.setSpeciesSizes(true)
 end
 
 -- ------- a PMD sheet scales about its ground point; HGSS about its feet
