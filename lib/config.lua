@@ -211,6 +211,11 @@ Config.INTERACT = {
 -- learning Surf or clearing a tree opens new ground (60 ticks = 1 s).
 Config.REACHABLE_SPAWNS = true
 Config.REACH_REBUILD_TICKS = 900
+-- Water seen from the shore: water within SHORE_WATER_RANGE cells (swimming
+-- through water) of a reachable cell is open to water spawns even without
+-- Surf, so lakes and the sea are alive while you walk past (a Battler swims
+-- out to them). A water Pokemon is kept anywhere in that connected water.
+Config.SHORE_WATER_RANGE = 4
 
 -- PMDCollab follower while the player surfs (PMD has no swim art): it shrinks
 -- into the player like a recall, and grows back out once on land. Duration of

@@ -65,7 +65,8 @@ function SpawnManager:_pruneUnreachable()
   if not self.reach then return end
   local doomed = {}
   for id, e in pairs(self.entities) do
-    if e.state == Config.STATE.AVAILABLE and not Reachability.has(self.reach, e.cellX, e.cellY) then
+    if e.state == Config.STATE.AVAILABLE and not e.engaged
+      and not self.source:canStay(e.cellX, e.cellY, e.terrain) then
       doomed[#doomed + 1] = id
     end
   end

@@ -123,6 +123,30 @@ do
   eq(#src:eligibleCells("land"), #all, "a freshly loaded map starts unrestricted")
 end
 
+-- ------- water seen from the shore spawns without Surf (Config.SHORE_WATER_RANGE)
+do
+  local Reach = V.require("reachability")
+  local Config = V.require("config")
+  -- one row: reachable land, six water cells, unreachable land, a cut-off pond cell
+  local row = { "land", "water", "water", "water", "water", "water", "water", "land", "water" }
+  local saveGrid, saveBounds = terrainGrid, fakeEngine.mapBounds
+  terrainGrid = { [0] = {} }
+  for x = 0, #row - 1 do terrainGrid[0][x] = row[x + 1] end
+  fakeEngine.mapBounds = function() return #row, 1 end
+  local src = EncounterSource.new({})
+  src:loadMap("ROUTE_1")
+  eq(#src:eligibleCells("water"), 7, "unrestricted: every water cell")
+  src:setReachable({ [Reach.key(0, 0)] = true })
+  local water = src:eligibleCells("water")
+  eq(#water, Config.SHORE_WATER_RANGE, "water within range of the reachable shore is eligible")
+  eq(water[#water].x, Config.SHORE_WATER_RANGE, "...counted out from the shore")
+  check(src:canStay(6, 0, "water"), "a water Pokemon may swim anywhere in that connected water")
+  check(not src:canStay(8, 0, "water"), "water not connected to the reachable shore is not kept")
+  check(not src:canStay(7, 0, "land"), "unreachable land is not kept")
+  check(src:canStay(0, 0, "land"), "reachable land is kept")
+  terrainGrid, fakeEngine.mapBounds = saveGrid, saveBounds
+end
+
 print("")
 if failures > 0 then
   io.stderr:write(failures .. " failure(s)\n")

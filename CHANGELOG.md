@@ -27,6 +27,10 @@
 
 - **The SHINY RATE option is gone, replaced by shiny chains.** Without Modern Spawns, wild
   Pokemon keep the game's own shiny odds. A saved SHINY RATE setting is simply ignored.
+- **Water Pokemon appear near the shore without Surf.** Before, water spawns only appeared on
+  water you could surf to, so lakes and the sea stayed empty until you had Surf. Now water up to
+  4 tiles out from any shore you can reach has visible water Pokemon too. A Battler swims out to
+  fight them when they're in range, using its swimming sprite.
 
 ## 1.6.2 (2026-10-10)
 
