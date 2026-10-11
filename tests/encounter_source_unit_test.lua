@@ -147,6 +147,17 @@ do
   terrainGrid, fakeEngine.mapBounds = saveGrid, saveBounds
 end
 
+-- ------- a swimmer never spawns on the last water row before a bank
+do
+  fakeEngine.isWater = function(x, y) return terrainGrid[y] ~= nil and terrainGrid[y][x] == "water" end
+  local src = EncounterSource.new({})
+  src:loadMap("ROUTE_1")
+  local water = src:eligibleCells("water")
+  eq(#water, 2, "the 2x2 pool: only its top row (water to the south) is eligible")
+  check(water[1].y == 0 and water[2].y == 0, "...the row above the bank is left out")
+  fakeEngine.isWater = nil
+end
+
 print("")
 if failures > 0 then
   io.stderr:write(failures .. " failure(s)\n")

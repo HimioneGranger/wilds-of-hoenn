@@ -224,6 +224,17 @@ do
   check(not SpriteSource.pmdFlies("479-wash"), "...unless its own key says false")
   check(SpriteSource.pmdFlies("413-trash") and not SpriteSource.pmdFlies(413), "a form key of its own wins over its dex")
   check(not SpriteSource.pmdFlies(nil) and not SpriteSource.pmdFlies("x"), "junk keys never fly")
+
+  -- grounding: a hovering non-flyer stands on its art, a flyer keeps its hover
+  local function hover() return { walk = { ay = 68.5, foot = 64 }, idle = { ay = 60, foot = 62 }, scale = 1 } end
+  local g = SpriteSource.groundPmd(hover(), 130)
+  eq(g.walk.ay, 64 - SpriteSource.PMD_FOOT_BELOW_SHADOW, "art above its shadow point -> stands on its art")
+  eq(g.walk.shadowY, 68.5, "...the shadow point is kept")
+  eq(g.idle.ay, 60, "art reaching below the shadow point -> unchanged")
+  check(g.grounded, "...marked done")
+  eq(SpriteSource.groundPmd(g, 130).walk.ay, 63, "grounding twice changes nothing")
+  eq(SpriteSource.groundPmd(hover(), 41).walk.ay, 68.5, "a true flyer keeps its hover")
+  eq(SpriteSource.groundPmd({ walk = { ay = 50 } }, 130).walk.ay, 50, "no foot (an older bake) -> unchanged")
   SpriteSource._setPmdWater(nil)
 end
 

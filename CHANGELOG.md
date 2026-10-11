@@ -1,6 +1,24 @@
 # Changelog
 
-## Unreleased
+## 1.7.1 (2026-10-11)
+
+### Changed
+
+- **Species sizes are gentler** (with Gen 3 HD Sprites), in both sprite styles. The smallest
+  Pokemon (Geodude, Joltik, Diglett) are about 11-12 px tall instead of 7-8 px, the biggest
+  (Kyurem, Koraidon, Rayquaza) about 40 px instead of 60+, and everything in between moves
+  toward the middle. Big Pokemon are still bigger than small ones.
+- **PMDCollab Pokemon stand on the ground.** Some PMDCollab sprites float above the spot they
+  stand on (Gyarados, Seviper, Drifloon and about 160 more), which looked like hovering on
+  land. They now stand on the bottom of their art, like the rest. True flyers (Zubat, Gastly,
+  Rayquaza ...) still hover.
+- **Swimming Pokemon keep off the bank.** A water Pokemon no longer spawns or swims on the last
+  row of water before a bank to its south, where it looked like it was bobbing on the ground.
+- **Shiny PMDCollab Pokemon stay shiny when they fight** your Battler. Their attack and hurt
+  animations used the normal colours; now they use PMDCollab's shiny art (about 1,010
+  species). Archen, Venipede, Dedenne, Necrozma and Marshadow have no shiny fight art upstream,
+  so theirs is recoloured with their own shiny palette. The HGSS + PMDCollab download is about
+  19 MB bigger for it.
 
 ### Removed
 

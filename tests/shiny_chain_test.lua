@@ -63,7 +63,9 @@ local function step()
 end
 
 local first = step()
-local species = first and tonumber(first.species)
+-- the engine's number (speciesId; species may be the key name, as Wilds' own hook reads it)
+local function idOf(e) return e and (tonumber(e.speciesId) or tonumber(e.species)) end
+local species = idOf(first)
 check(species ~= nil, "a Route 1 step encounter (species " .. tostring(species) .. ")")
 check(first and first.ivs == nil, "no chain yet: Wilds leaves its IVs to the engine")
 
@@ -71,7 +73,7 @@ for _ = 1, 40 do ms.chainRecord(species, "win") end
 check(ms.chain() and ms.chain().count == 40, "forty in a row (through Modern Spawns' export)")
 
 local chained = step()
-check(chained and tonumber(chained.species) == species, "the step encounter is the chained species")
+check(idOf(chained) == species, "the step encounter is the chained species")
 local perfect = 0
 for _, v in pairs(chained and chained.ivs or {}) do if v == 31 then perfect = perfect + 1 end end
 check(perfect >= 3, "...with the chain's three perfect stats (" .. perfect .. ")")

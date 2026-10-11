@@ -19,6 +19,13 @@ function EncounterSource.new(mod)
   }, EncounterSource)
 end
 
+--- Whether a swimmer may stand on water cell (x, y): the cell south of it is water too.
+--- A swimmer is drawn a little below its tile (its waterline, for perspective), so on the
+--- last row before a bank it would sit on the bank and look like it bobs on the ground.
+function EncounterSource.openWater(x, y)
+  return not EnginePatch.isWater or EnginePatch.isWater(x, y + 1)
+end
+
 --- Rescans the current map: cell terrain classification (land/water, from
 --- the ROM's metatile encounter type) and whether its wild table has a
 --- land/water area at all. Called on map.entered.
@@ -56,7 +63,7 @@ function EncounterSource:loadMap(mapId)
       local terrain = EnginePatch.terrainAt(x, y)
       if terrain == "land" and self.hasLand then
         self.cells.land[#self.cells.land + 1] = { x = x, y = y }
-      elseif terrain == "water" and self.hasWater then
+      elseif terrain == "water" and self.hasWater and EncounterSource.openWater(x, y) then
         self.cells.water[#self.cells.water + 1] = { x = x, y = y }
       end
     end

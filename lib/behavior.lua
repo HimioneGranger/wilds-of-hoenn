@@ -36,6 +36,8 @@ local function canStep(entity, game, tx, ty)
   -- could never actually take.
   if EnginePatch.terrainAt(tx, ty) ~= entity.terrain then return false end
   local onWater = entity.terrain == "water"
+  -- a swimmer keeps off the last water row before a bank (EncounterSource.openWater)
+  if onWater and EnginePatch.isWater and not EnginePatch.isWater(tx, ty + 1) then return false end
   return EnginePatch.canEnter(game, tx, ty, {
     fromX = entity.cellX, fromY = entity.cellY, dir = entity.facing,
     surfing = onWater, elevation = entity.elevation,

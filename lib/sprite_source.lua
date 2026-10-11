@@ -231,9 +231,33 @@ function SpriteSource.pmdInfo(mod, dex)
   local index = SpriteSource.pmdIndex(mod)
   local info = index and (type(dex) == "number" or type(dex) == "string") and index.dex[tostring(dex)]
   if type(info) == "table" and type(info.walk) == "table" and type(info.idle) == "table" then
+    if not info.grounded then SpriteSource.groundPmd(info, dex) end
     return info
   end
   return nil
+end
+
+--- Stands a non-flyer on its art: PMD's shadow point (`ay`) usually sits about a pixel
+--- above the art's bottom edge, but can sit below the art (Gyarados' coils hover over it).
+--- Each animation whose baked `foot` (the art's median bottom edge) is less than
+--- PMD_FOOT_BELOW_SHADOW below `ay` moves `ay` up to that distance, so it stands like
+--- every other Pokemon; the shadow point is kept as `shadowY`. True flyers
+--- (lib/pmd_water.lua) keep their hover. Once per species; an index without `foot` (an
+--- older bake) is left as it is.
+SpriteSource.PMD_FOOT_BELOW_SHADOW = 1
+function SpriteSource.groundPmd(info, key)
+  info.grounded = true
+  if SpriteSource.pmdFlies(key) then return info end
+  for _, entry in pairs(info) do
+    if type(entry) == "table" and tonumber(entry.foot) and tonumber(entry.ay) and not entry.shadowY then
+      local ay = entry.foot - SpriteSource.PMD_FOOT_BELOW_SHADOW
+      if ay < entry.ay then
+        entry.shadowY = entry.ay
+        entry.ay = ay
+      end
+    end
+  end
+  return info
 end
 
 --- rel path of one PMD animation sheet ("walk" | "idle"); the shiny sheet

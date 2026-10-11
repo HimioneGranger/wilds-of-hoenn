@@ -32,7 +32,9 @@ true_size_scale: up only, never below 1).
 The index records, per animation, `cw`/`ch` (cell size), `cols`, `durations`
 (60 Hz ticks, straight from AnimData.xml) and `ax`/`ay` (the ground point
 inside a cell; the renderer puts that point on the tile's feet position) and
-`waterline` / `bowl` (where a swimming Pokemon's foam bowl ends and how deep it is).
+`waterline` / `bowl` (where a swimming Pokemon's foam bowl ends and how deep it is) and
+`foot` (the art's median bottom edge; a non-flyer whose art hovers above its shadow point
+is grounded there, see lib/sprite_source.lua).
 
     python3 tools/generate_pmd_sprites.py
     python3 tools/generate_pmd_sprites.py --species 6,25,252 --force
@@ -312,6 +314,57 @@ def waterline_of(sheet: Image.Image, entry: dict, keep: float) -> int | None:
     return max(3, min(ch, round(statistics.median(ws))))
 
 
+def foot_of(sheet: Image.Image, entry: dict) -> float | None:
+    """Where the art stands (cell pixels): the median bottom edge of the frames. PMD's
+    shadow point can sit below the art (Gyarados' coils hover over it); the game grounds
+    such a non-flyer here instead (lib/sprite_source.lua). None for an empty sheet."""
+    cw, ch = entry["cw"], entry["ch"]
+    bottoms = []
+    for x, y in cells_of(entry):
+        box = sheet.crop((x, y, x + cw, y + ch)).getchannel("A").getbbox()
+        if box:
+            bottoms.append(box[3])
+    return float(statistics.median(bottoms)) if bottoms else None
+
+
+def pixels(img: Image.Image):
+    """Every pixel of img in order (Pillow 12 renamed getdata)."""
+    return getattr(img, "get_flattened_data", img.getdata)()
+
+
+def shiny_palette(normal: Image.Image, shiny: Image.Image) -> dict:
+    """normal colour -> shiny colour, read pixel by pixel from two sheets of the same
+    layout (a species' Walk); each colour takes the shiny colour it most often becomes."""
+    votes: dict = {}
+    for a, b in zip(pixels(normal), pixels(shiny)):
+        if a[3] and b[3]:
+            votes.setdefault(a, {}).setdefault(b, 0)
+            votes[a][b] += 1
+    return {a: max(bs, key=bs.get) for a, bs in votes.items()}
+
+
+def recolor(sheet: Image.Image, palette: dict) -> Image.Image:
+    """`sheet` in shiny colours: a colour the palette knows is swapped, any other one is
+    shifted like the nearest colour it knows (an attack's own highlight shades)."""
+    known = list(palette)
+    cache: dict = {}
+
+    def swap(c):
+        if not c[3]:
+            return c
+        if c in palette:
+            return palette[c]
+        if c not in cache:
+            near = min(known, key=lambda k: sum((k[i] - c[i]) ** 2 for i in range(3)))
+            to = palette[near]
+            cache[c] = tuple(max(0, min(255, c[i] + to[i] - near[i])) for i in range(3)) + (c[3],)
+        return cache[c]
+
+    out = Image.new("RGBA", sheet.size)
+    out.putdata([swap(c) for c in pixels(sheet)])
+    return out
+
+
 def bowl_rows(sheet: Image.Image, entry: dict, w: int) -> int:
     """Depth of the bowl: 3 rows for a body at least 14 px wide at the waterline, else 2
     (the HGSS sheets: Lapras 3, Squirtle 2)."""
@@ -574,6 +627,7 @@ def main() -> int:
         shiny_dir = shiny_dir if shiny_dir.is_dir() else None
 
         entry: dict = {}
+        walk_pair = (None, None)
         ok = True
         for anim in ANIMS:
             meta = anims.get(anim.capitalize())
@@ -594,10 +648,12 @@ def main() -> int:
                 ok = False
                 break
             info, normal, shiny = result
+            info["foot"] = foot_of(normal, info)
             bake_water(out, anim, dex, key, normal, shiny, info, args.water_keep, args.force)
             entry[anim] = dict(info, shiny=shiny is not None)
             if anim == "walk":
                 entry["scale"] = true_size_scale(dex, key, normal, info)
+                walk_pair = (normal, shiny)
             normal_path = out / anim / f"{key}-normal.png"
             if args.force or not normal_path.exists():
                 normal.save(normal_path, "PNG", optimize=True)
@@ -618,13 +674,21 @@ def main() -> int:
                     for variant in ("normal", "shiny"):
                         (out / f"foam{anim}" / f"{key}-{variant}.png").unlink(missing_ok=True)
                     continue
-                info, normal, _shiny = result
-                bake_water(out, anim, dex, key, normal, None, info, args.water_keep, args.force)
-                # fights are brief: the normal sheet serves shiny too (keeps the ZIP small)
-                entry[anim] = dict(info, shiny=False)
-                (out / anim / f"{key}-shiny.png").unlink(missing_ok=True)
+                info, normal, shiny = result
+                info["foot"] = foot_of(normal, info)
+                if shiny is None and walk_pair[1] is not None:
+                    # no shiny fight art upstream, but a shiny Walk: recolour with its palette
+                    shiny = recolor(normal, shiny_palette(*walk_pair))
+                    info["shinyRecolored"] = True
+                bake_water(out, anim, dex, key, normal, shiny, info, args.water_keep, args.force)
+                entry[anim] = dict(info, shiny=shiny is not None)
+                shiny_path = out / anim / f"{key}-shiny.png"
+                if shiny is None:
+                    shiny_path.unlink(missing_ok=True)
                 if args.force or not normal_path.exists():
                     normal.save(normal_path, "PNG", optimize=True)
+                if shiny is not None and (args.force or not shiny_path.exists()):
+                    shiny.save(shiny_path, "PNG", optimize=True)
         if not ok:
             for anim in ALL_ANIMS:  # never leave half a species behind
                 for variant in ("normal", "shiny"):

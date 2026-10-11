@@ -132,7 +132,9 @@ Config.FORAGE = {
 -- PMDCollab style (lib/pmd_renderer.lua). The ground point of a PMD frame
 -- (the shadow marker) is placed at the tile's horizontal centre and
 -- PMD_GROUND_Y pixels below the tile's top edge (a 16px tile; 12 puts the
--- feet just above its bottom edge). PMD_SCALE multiplies the art, and
+-- feet just above its bottom edge, a little behind the player's). A non-flyer
+-- whose art hovers over its shadow point is grounded on its art first
+-- (SpriteSource.groundPmd). PMD_SCALE multiplies the art, and
 -- PMD_WALK_SPEED multiplies the Walk animation clock (1 = the durations in
 -- AnimData.xml). All three are meant to be tuned by eye in game.
 Config.PMD_SCALE = 1

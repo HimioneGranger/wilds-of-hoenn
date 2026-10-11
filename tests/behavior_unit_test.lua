@@ -109,6 +109,16 @@ local waterMon = {
 Behavior.tick(waterMon, {}, seq({ 0.1, 0.99 }))
 check(waterMon.moving == false, "a water spawn refuses a step onto land")
 
+-- ------- a swimmer keeps off the last water row before a bank (land to its south)
+do
+  fakeEngine.terrainAt = function(_tx, _ty) return "water" end
+  fakeEngine.isWater = function(_tx, ty) return ty < 4 end -- the bank is row 4
+  local m = { cellX = 2, cellY = 2, facing = "down", terrain = "water", elevation = 3 }
+  check(Behavior._canStep(m, {}, 2, 2), "open water (water to the south) is fine")
+  check(not Behavior._canStep(m, {}, 2, 3), "the row above the bank is refused")
+  fakeEngine.isWater = nil
+end
+
 -- ------- regression: a roaming land spawn refuses a walkable tile that is
 -- NOT an encounter tile at all (a path, a doodad, anywhere outside its own
 -- grass patch) -- the actual bug report this guards against: canEnter and

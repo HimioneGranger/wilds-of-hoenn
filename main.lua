@@ -82,7 +82,7 @@ return function(mod)
   mod.log:info("[wilds_of_hoenn] sprite atlas: %s", atlasOk and "installed" or tostring(atlasReason))
 
   mod.exports = mod.exports or {}
-  mod.exports.version = "1.7.0"
+  mod.exports.version = "1.7.1"
   mod.exports.engineReady = false
 
   local layout = EnginePatch.layoutName()
